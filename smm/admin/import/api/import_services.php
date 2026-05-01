@@ -37,11 +37,22 @@ try {
     $services = $api->services();
     
     // Debug: log what we got
+    error_log("=== SERVICE IMPORT DEBUG ===");
     error_log("API Response Type: " . gettype($services));
-    error_log("API Response: " . json_encode($services));
+    error_log("API Response Count: " . count($services ?? []));
+    if (is_array($services) && count($services) > 0) {
+        error_log("First Item Type: " . gettype($services[0]));
+        if (is_object($services[0])) {
+            error_log("First Item Keys: " . implode(", ", array_keys((array)$services[0])));
+        } elseif (is_array($services[0])) {
+            error_log("First Item Keys: " . implode(", ", array_keys($services[0])));
+        }
+    }
+    error_log("Full Response: " . substr(json_encode($services), 0, 500));
     
     // Check if services were fetched successfully
     if (!$services) {
+        error_log("ERROR: Services is empty or false");
         echo json_encode([
             'success' => false,
             'message' => 'Failed to fetch services from API. Please check your API credentials.'
@@ -70,21 +81,32 @@ try {
     
     // Filter and normalize services to array format
     $validServices = [];
+    error_log("Starting service filter loop, total items: " . count($services));
+    
     foreach ($services as $key => $service) {
         // Services from API should have 'service' field (numeric ID)
+        error_log("Item $key: Type=" . gettype($service));
+        
         if (is_object($service)) {
             // Convert object to array for consistent processing
             $serviceArray = json_decode(json_encode($service), true);
+            error_log("  Object converted to array, has 'service'? " . (isset($serviceArray['service']) ? 'YES' : 'NO'));
             if (isset($serviceArray['service'])) {
                 $validServices[] = $serviceArray;
             }
         } elseif (is_array($service) && isset($service['service'])) {
             // Already an array with service field
+            error_log("  Array already has 'service', adding");
             $validServices[] = $service;
+        } else {
+            error_log("  SKIPPED: is_array=" . (is_array($service) ? 'YES' : 'NO') . ", has_service=" . (is_array($service) && isset($service['service']) ? 'YES' : 'NO'));
         }
     }
     
+    error_log("Filter complete: valid_services count = " . count($validServices));
+    
     if (empty($validServices)) {
+        error_log("ERROR: No valid services found after filtering");
         echo json_encode([
             'success' => false,
             'message' => 'No valid services found. Check API response format.',
@@ -151,8 +173,12 @@ try {
             $serviceName = normalizeServiceText($service['name'] ?? '');
             $categoryName = normalizeServiceText($service['category'] ?? '');
             $description = normalizeServiceText($service['description'] ?? '');
+            $apiServiceId = isset($service['service']) ? intval($service['service']) : 0;
+            
+            error_log("Processing service: id=$apiServiceId, name=$serviceName, category=$categoryName");
             
             if ($serviceName === '' || $categoryName === '') {
+                error_log("  SKIPPED: Empty name or category (name='$serviceName', category='$categoryName')");
                 $errors++;
                 continue;
             }
