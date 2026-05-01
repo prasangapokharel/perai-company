@@ -53,7 +53,7 @@ switch ($period) {
 $totalDeposits = $conn->query("
     SELECT COUNT(*) as count, SUM(amount) as total
     FROM transactions 
-    WHERE gateway = 'oxapay' 
+    WHERE payment_method = 'oxapay' 
     AND type = 'deposit' 
     AND status = 'completed'
     AND created_at >= '$dateFrom' 
@@ -64,7 +64,7 @@ $totalDeposits = $conn->query("
 $pendingDeposits = $conn->query("
     SELECT COUNT(*) as count, SUM(amount) as total
     FROM transactions 
-    WHERE gateway = 'oxapay' 
+    WHERE payment_method = 'oxapay' 
     AND type = 'deposit' 
     AND status = 'pending'
     AND created_at >= '$dateFrom' 
@@ -75,14 +75,14 @@ $pendingDeposits = $conn->query("
 $failedDeposits = $conn->query("
     SELECT COUNT(*) as count, SUM(amount) as total
     FROM transactions 
-    WHERE gateway = 'oxapay' 
+    WHERE payment_method = 'oxapay' 
     AND type = 'deposit' 
-    AND status = 'failed'
+    AND status = 'canceled'
     AND created_at >= '$dateFrom' 
     AND created_at <= '$dateTo'
 ")->fetch_assoc();
 
-// Total transactions (all gateways for comparison)
+// Total transactions (all payment methods for comparison)
 $totalAllDeposits = $conn->query("
     SELECT COUNT(*) as count, SUM(amount) as total
     FROM transactions 
@@ -102,18 +102,17 @@ $failureRate = $totalCount > 0 ? ($failedCount / $totalCount) * 100 : 0;
 $pendingRate = $totalCount > 0 ? ($pendingCount / $totalCount) * 100 : 0;
 
 // ============================================================================
-// CURRENCY BREAKDOWN
+// PAYMENT METHOD BREAKDOWN
 // ============================================================================
 
-$currencyBreakdown = $conn->query("
-    SELECT currency, COUNT(*) as count, SUM(amount) as total
+$paymentMethods = $conn->query("
+    SELECT payment_method, COUNT(*) as count, SUM(amount) as total
     FROM transactions 
-    WHERE gateway = 'oxapay' 
-    AND type = 'deposit' 
+    WHERE type = 'deposit' 
     AND status = 'completed'
     AND created_at >= '$dateFrom' 
     AND created_at <= '$dateTo'
-    GROUP BY currency
+    GROUP BY payment_method
     ORDER BY total DESC
 ");
 
@@ -126,7 +125,7 @@ if ($period === 'today') {
     $revenueData = $conn->query("
         SELECT HOUR(created_at) as hour, COUNT(*) as transactions, SUM(amount) as total
         FROM transactions 
-        WHERE gateway = 'oxapay' 
+        WHERE payment_method = 'oxapay' 
         AND type = 'deposit' 
         AND status = 'completed'
         AND DATE(created_at) = CURDATE()
@@ -140,7 +139,7 @@ if ($period === 'today') {
     $revenueData = $conn->query("
         SELECT DATE(created_at) as date, COUNT(*) as transactions, SUM(amount) as total
         FROM transactions 
-        WHERE gateway = 'oxapay' 
+        WHERE payment_method = 'oxapay' 
         AND type = 'deposit' 
         AND status = 'completed'
         AND created_at >= '$dateFrom' 
@@ -174,7 +173,7 @@ $recentTransactions = $conn->query("
     SELECT t.*, u.username, u.email
     FROM transactions t
     JOIN users u ON t.user_id = u.id
-    WHERE t.gateway = 'oxapay' 
+    WHERE t.payment_method = 'oxapay' 
     AND t.type = 'deposit'
     AND t.created_at >= '$dateFrom' 
     AND t.created_at <= '$dateTo'
@@ -190,7 +189,7 @@ $topUsers = $conn->query("
     SELECT u.id, u.username, u.email, COUNT(t.id) as transactions, SUM(t.amount) as total
     FROM transactions t
     JOIN users u ON t.user_id = u.id
-    WHERE t.gateway = 'oxapay' 
+    WHERE t.payment_method = 'oxapay' 
     AND t.type = 'deposit'
     AND t.status = 'completed'
     AND t.created_at >= '$dateFrom' 
@@ -288,25 +287,25 @@ include 'admin-header.php';
         </div>
     </div>
 
-    <!-- Currency Breakdown -->
+    <!-- Payment Methods Breakdown -->
     <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
-        <h3 class="text-lg font-bold text-slate-900 mb-6">Currency Breakdown</h3>
+        <h3 class="text-lg font-bold text-slate-900 mb-6">Payment Methods Breakdown</h3>
         <div class="overflow-x-auto">
             <table class="w-full">
                 <thead class="border-b border-slate-200">
                     <tr>
-                        <th class="text-left py-3 px-4 font-bold text-slate-900 text-sm">Currency</th>
+                        <th class="text-left py-3 px-4 font-bold text-slate-900 text-sm">Payment Method</th>
                         <th class="text-right py-3 px-4 font-bold text-slate-900 text-sm">Transactions</th>
                         <th class="text-right py-3 px-4 font-bold text-slate-900 text-sm">Total Amount</th>
                         <th class="text-right py-3 px-4 font-bold text-slate-900 text-sm">Percentage</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
-                    <?php while ($row = $currencyBreakdown->fetch_assoc()): ?>
-                        <?php $percentage = ($totalDeposits['total'] > 0) ? (($row['total'] / $totalDeposits['total']) * 100) : 0; ?>
+                    <?php while ($row = $paymentMethods->fetch_assoc()): ?>
+                        <?php $percentage = ($totalAllDeposits['total'] > 0) ? (($row['total'] / $totalAllDeposits['total']) * 100) : 0; ?>
                         <tr class="hover:bg-slate-50">
                             <td class="py-4 px-4">
-                                <span class="font-bold text-slate-900"><?php echo htmlspecialchars($row['currency']); ?></span>
+                                <span class="font-bold text-slate-900"><?php echo htmlspecialchars($row['payment_method'] ?: 'Unknown'); ?></span>
                             </td>
                             <td class="py-4 px-4 text-right text-slate-700"><?php echo $row['count']; ?></td>
                             <td class="py-4 px-4 text-right font-bold text-emerald-600"><?php echo formatCurrency($row['total']); ?></td>
@@ -359,7 +358,6 @@ include 'admin-header.php';
                     <tr>
                         <th class="text-left py-3 px-4 font-bold text-slate-900 text-sm">User</th>
                         <th class="text-left py-3 px-4 font-bold text-slate-900 text-sm">Amount</th>
-                        <th class="text-left py-3 px-4 font-bold text-slate-900 text-sm">Currency</th>
                         <th class="text-left py-3 px-4 font-bold text-slate-900 text-sm">Status</th>
                         <th class="text-left py-3 px-4 font-bold text-slate-900 text-sm">Date</th>
                     </tr>
@@ -374,14 +372,12 @@ include 'admin-header.php';
                                 </div>
                             </td>
                             <td class="py-4 px-4 font-bold text-emerald-600"><?php echo formatCurrency($row['amount']); ?></td>
-                            <td class="py-4 px-4 text-slate-700"><?php echo htmlspecialchars($row['currency']); ?></td>
                             <td class="py-4 px-4">
                                 <?php 
                                 $statusColors = [
                                     'completed' => 'bg-emerald-100 text-emerald-800',
                                     'pending' => 'bg-amber-100 text-amber-800',
-                                    'failed' => 'bg-red-100 text-red-800',
-                                    'cancelled' => 'bg-slate-100 text-slate-800'
+                                    'canceled' => 'bg-red-100 text-red-800',
                                 ];
                                 $statusClass = $statusColors[$row['status']] ?? 'bg-slate-100 text-slate-800';
                                 ?>
@@ -478,7 +474,7 @@ if (statusCtx) {
     new Chart(statusCtx, {
         type: 'doughnut',
         data: {
-            labels: ['Completed', 'Pending', 'Failed'],
+            labels: ['Completed', 'Pending', 'Canceled'],
             datasets: [{
                 data: [
                     <?php echo $completedCount; ?>,
