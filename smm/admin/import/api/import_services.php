@@ -194,16 +194,23 @@ try {
             $description = $conn->real_escape_string($description);
             
             $categoryId = null;
+            error_log("    DEBUG: serviceCategoriesTableExists=$serviceCategoriesTableExists, hasCategoryIdColumn=$hasCategoryIdColumn");
+            
             if ($serviceCategoriesTableExists && $hasCategoryIdColumn) {
                 $catResult = $conn->query("SELECT id FROM service_categories WHERE name = '$categoryName'");
                 if ($catResult && $catResult->num_rows > 0) {
                     $categoryId = (int) $catResult->fetch_assoc()['id'];
+                    error_log("    Found existing category: '$categoryName' with id=$categoryId");
                 } else {
                     if ($conn->query("INSERT INTO service_categories (name) VALUES ('$categoryName')")) {
                         $categoryId = (int) $conn->insert_id;
-                        error_log("    Created category: '$categoryName' with id=$categoryId");
+                        error_log("    Created NEW category: '$categoryName' with id=$categoryId");
+                    } else {
+                        error_log("    FAILED to create category: " . $conn->error);
                     }
                 }
+            } else {
+                error_log("    SKIPPING category logic: serviceCategoriesTableExists=$serviceCategoriesTableExists, hasCategoryIdColumn=$hasCategoryIdColumn");
             }
             
             // If still no category ID, create a default one
@@ -211,11 +218,13 @@ try {
                 error_log("    WARNING: No category_id found, creating default category");
                 if ($conn->query("INSERT INTO service_categories (name) VALUES ('Uncategorized')")) {
                     $categoryId = (int) $conn->insert_id;
+                    error_log("    Created default 'Uncategorized' with id=$categoryId");
                 } else {
                     // Try to use existing Uncategorized
                     $uncatResult = $conn->query("SELECT id FROM service_categories WHERE name = 'Uncategorized' LIMIT 1");
                     if ($uncatResult && $uncatResult->num_rows > 0) {
                         $categoryId = (int) $uncatResult->fetch_assoc()['id'];
+                        error_log("    Using existing 'Uncategorized' with id=$categoryId");
                     }
                 }
             }
@@ -233,6 +242,13 @@ try {
             
             if ($apiServiceId <= 0) {
                 error_log("  SKIPPED: Invalid apiServiceId ($apiServiceId)");
+                $errors++;
+                continue;
+            }
+            
+            // Guard against NULL category_id which would violate NOT NULL constraint
+            if ($categoryId === null) {
+                error_log("  SKIPPED: category_id is NULL - this would violate NOT NULL constraint");
                 $errors++;
                 continue;
             }
