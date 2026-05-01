@@ -136,16 +136,19 @@ try {
     if ($tableCheck && $tableCheck->num_rows > 0) {
         $serviceCategoriesTableExists = true;
     }
+    error_log("SCHEMA CHECK: service_categories table exists? $serviceCategoriesTableExists");
 
     $columnCheck = $conn->query("SHOW COLUMNS FROM services LIKE 'category_id'");
     if ($columnCheck && $columnCheck->num_rows > 0) {
         $hasCategoryIdColumn = true;
     }
+    error_log("SCHEMA CHECK: services.category_id column exists? $hasCategoryIdColumn");
 
     $columnCheck = $conn->query("SHOW COLUMNS FROM services LIKE 'category'");
     if ($columnCheck && $columnCheck->num_rows > 0) {
         $hasCategoryColumn = true;
     }
+    error_log("SCHEMA CHECK: services.category column exists? $hasCategoryColumn");
 
     $columnCheck = $conn->query("SHOW COLUMNS FROM services LIKE 'status'");
     if ($columnCheck && $columnCheck->num_rows > 0) {
