@@ -49,7 +49,8 @@ try {
         exit;
     }
     
-    if (isset($services->error)) {
+    // Handle object-based error responses
+    if (is_object($services) && isset($services->error)) {
         echo json_encode([
             'success' => false,
             'message' => 'API Error: ' . $services->error
@@ -57,21 +58,29 @@ try {
         exit;
     }
     
-    // Convert to array if needed
+    // Convert to array for processing
+    if (is_object($services)) {
+        $services = json_decode(json_encode($services), true);
+    }
+    
+    // Ensure we have an array
     if (!is_array($services)) {
         $services = (array) $services;
     }
     
-    // Filter out error responses
+    // Filter and normalize services to array format
     $validServices = [];
     foreach ($services as $key => $service) {
         // Services from API should have 'service' field (numeric ID)
         if (is_object($service)) {
-            if (isset($service->service)) {
-                $validServices[] = $service;
+            // Convert object to array for consistent processing
+            $serviceArray = json_decode(json_encode($service), true);
+            if (isset($serviceArray['service'])) {
+                $validServices[] = $serviceArray;
             }
         } elseif (is_array($service) && isset($service['service'])) {
-            $validServices[] = (object) $service;
+            // Already an array with service field
+            $validServices[] = $service;
         }
     }
     
@@ -133,14 +142,15 @@ try {
     // Import services
     foreach ($services as $service) {
         try {
-            // Ensure service is an object
-            if (is_array($service)) {
-                $service = (object) $service;
+            // Ensure service is an array for consistent property access
+            if (is_object($service)) {
+                $service = json_decode(json_encode($service), true);
             }
             
-            $serviceName = normalizeServiceText($service->name ?? '');
-            $categoryName = normalizeServiceText($service->category ?? '');
-            $description = normalizeServiceText($service->description ?? '');
+            // Access properties as array keys
+            $serviceName = normalizeServiceText($service['name'] ?? '');
+            $categoryName = normalizeServiceText($service['category'] ?? '');
+            $description = normalizeServiceText($service['description'] ?? '');
             
             if ($serviceName === '' || $categoryName === '') {
                 $errors++;
@@ -164,11 +174,11 @@ try {
             }
             
             // Calculate price with markup
-            $price = floatval($service->rate ?? 0) * (1 + $markup / 100);
+            $price = floatval($service['rate'] ?? 0) * (1 + $markup / 100);
             
-            $minQty = isset($service->min) ? intval($service->min) : 0;
-            $maxQty = isset($service->max) ? intval($service->max) : 0;
-            $apiServiceId = isset($service->service) ? intval($service->service) : 0;
+            $minQty = isset($service['min']) ? intval($service['min']) : 0;
+            $maxQty = isset($service['max']) ? intval($service['max']) : 0;
+            $apiServiceId = isset($service['service']) ? intval($service['service']) : 0;
             
             if ($apiServiceId <= 0) {
                 $errors++;
