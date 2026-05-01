@@ -31,32 +31,32 @@ $baseUrl = $isSubfolder ? '../' : '';
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Ubuntu"', 'sans-serif'],
-                        display: ['"Bebas Neue"', 'cursive'],
-                    },
-                    colors: {
-                        emerald: {
-                            50: '#ecfdf5',
-                            100: '#d1fae5',
-                            200: '#a7f3d0',
-                            300: '#6ee7b7',
-                            400: '#34d399',
-                            500: '#10b981',
-                            600: '#059669',
-                            700: '#047857',
-                            800: '#065f46',
-                            900: '#064e3b',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+     <script>
+         tailwind.config = {
+             theme: {
+                 extend: {
+                     fontFamily: {
+                         sans: ['"Ubuntu"', 'sans-serif'],
+                         display: ['"Bebas Neue"', 'cursive'],
+                     },
+                     colors: {
+                         primary: {
+                             50: '#eff6ff',
+                             100: '#dbeafe',
+                             200: '#bfdbfe',
+                             300: '#93c5fd',
+                             400: '#60a5fa',
+                             500: '#3b82f6',
+                             600: '#2563eb',
+                             700: '#1d4ed8',
+                             800: '#1e40af',
+                             900: '#1e3a8a',
+                         }
+                     }
+                 }
+             }
+         }
+     </script>
     
     <style>
         /* Custom Scrollbar */
@@ -78,15 +78,15 @@ $baseUrl = $isSubfolder ? '../' : '';
         }
         
         .admin-nav-item:hover {
-            color: #10b981;
-            background: #f0fdf4;
-        }
-        
-        .admin-nav-item.active {
-            color: #ffffff;
-            background: #10b981;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-        }
+             color: #3b82f6;
+             background: #eff6ff;
+         }
+         
+         .admin-nav-item.active {
+             color: #ffffff;
+             background: #3b82f6;
+             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+         }
 
         .sidebar {
             transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -112,15 +112,15 @@ $baseUrl = $isSubfolder ? '../' : '';
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                     </button>
                     <a href="<?php echo $baseUrl; ?>dashboard/" class="flex items-center gap-2">
-                        <div class="bg-emerald-500 text-white p-1.5 rounded-lg">
+                        <div class="bg-primary-500 text-white p-1.5 rounded-lg">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
                         </div>
-                        <span class="text-xl font-black text-slate-900 tracking-tight uppercase">Admin<span class="text-emerald-500">Core</span></span>
+                        <span class="text-xl font-black text-slate-900 tracking-tight uppercase">Admin<span class="text-primary-500">Core</span></span>
                     </a>
                 </div>
 
                 <div class="flex items-center gap-4">
-                    <a href="/" class="hidden sm:flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-500 hover:text-emerald-600 transition-colors uppercase tracking-widest">
+                    <a href="/" class="hidden sm:flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-500 hover:text-primary-600 transition-colors uppercase tracking-widest">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                         View Website
                     </a>

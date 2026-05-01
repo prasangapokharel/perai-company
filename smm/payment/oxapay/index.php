@@ -149,13 +149,13 @@ include '../../include/user-layout-start.php';
     
     <?php if ($paymentUrl): ?>
         <!-- Payment Generated Successfully -->
-        <div class="mb-8 p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-start">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-500 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+        <div class="mb-8 p-4 rounded-xl bg-primary-50 border border-primary-200 flex items-start">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary-500 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
             </svg>
             <div class="ml-4 flex-1">
-                <h3 class="text-lg font-semibold text-emerald-800">Invoice Ready</h3>
-                <p class="mt-1 text-emerald-700">Your payment invoice is ready. Click below to proceed to payment.</p>
+                <h3 class="text-lg font-semibold text-primary-800">Invoice Ready</h3>
+                <p class="mt-1 text-primary-700">Your payment invoice is ready. Click below to proceed to payment.</p>
             </div>
         </div>
         
@@ -176,7 +176,7 @@ include '../../include/user-layout-start.php';
                 <div class="flex items-end justify-end">
                     <div class="text-right">
                         <p class="text-sm text-slate-500 font-bold uppercase tracking-wider mb-2">Amount to Pay</p>
-                        <p class="text-4xl font-bold text-emerald-600">$<?php echo formatCurrency($amount); ?></p>
+                        <p class="text-4xl font-bold text-primary-600">$<?php echo formatCurrency($amount); ?></p>
                         <p class="text-xs text-slate-400 mt-2">Currency: <?php echo OXAPAY_DEFAULT_CURRENCY; ?></p>
                     </div>
                 </div>
@@ -224,7 +224,7 @@ include '../../include/user-layout-start.php';
                 <div class="flex items-end justify-end">
                     <div class="text-right">
                         <p class="text-sm text-slate-500 font-bold uppercase tracking-wider mb-2">Amount to Pay</p>
-                        <p class="text-4xl font-bold text-emerald-600">$<?php echo formatCurrency($amount); ?></p>
+                        <p class="text-4xl font-bold text-primary-600">$<?php echo formatCurrency($amount); ?></p>
                         <p class="text-xs text-slate-400 mt-2">Currency: <?php echo OXAPAY_DEFAULT_CURRENCY; ?></p>
                     </div>
                 </div>
@@ -233,7 +233,7 @@ include '../../include/user-layout-start.php';
             <!-- Generating Message -->
             <div class="text-center py-8">
                 <div class="inline-block">
-                    <svg class="animate-spin h-12 w-12 text-emerald-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <svg class="animate-spin h-12 w-12 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>

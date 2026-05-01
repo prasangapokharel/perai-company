@@ -62,7 +62,7 @@ include '../include/user-layout-start.php';
             <h1 class="text-3xl md:text-4xl font-display text-gray-900 tracking-tight uppercase">Orders</h1>
             <p class="text-xs md:text-sm text-gray-500 mt-1 uppercase tracking-widest font-bold">Track and manage your service orders</p>
         </div>
-        <a href="../order/" class="inline-flex items-center justify-center px-4 py-2 text-sm font-bold rounded-xl text-white bg-emerald-600 hover:bg-emerald-700 shadow-md hover:shadow-lg transition-all duration-200 whitespace-nowrap">
+        <a href="../order/" class="inline-flex items-center justify-center px-4 py-2 text-sm font-bold rounded-xl text-white bg-primary-600 hover:bg-primary-700 shadow-md hover:shadow-lg transition-all duration-200 whitespace-nowrap">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
             New Order
         </a>
@@ -84,7 +84,7 @@ include '../include/user-layout-start.php';
                 $isActive = $statusFilter === $key;
             ?>
             <a href="?<?php echo $key ? "status=$key" : ''; ?>" 
-               class="px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 flex-shrink-0 <?php echo $isActive ? 'bg-emerald-600 text-white shadow-md shadow-emerald-200' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:bg-slate-50'; ?>">
+               class="px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 flex-shrink-0 <?php echo $isActive ? 'bg-primary-600 text-white shadow-md shadow-emerald-200' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:bg-slate-50'; ?>">
                 <?php echo $label; ?>
             </a>
             <?php endforeach; ?>
@@ -106,7 +106,7 @@ include '../include/user-layout-start.php';
                             </div>
                             <?php 
                             $statusClasses = [
-                                'completed' => 'bg-emerald-50 text-emerald-700 border-emerald-100',
+                                'completed' => 'bg-primary-50 text-primary-700 border-primary-100',
                                 'pending' => 'bg-amber-50 text-amber-700 border-amber-100',
                                 'processing' => 'bg-blue-50 text-blue-700 border-blue-100',
                                 'canceled' => 'bg-rose-50 text-rose-700 border-rose-100',
@@ -128,7 +128,7 @@ include '../include/user-layout-start.php';
                         <!-- Link -->
                         <div class="mb-3">
                             <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Link</p>
-                            <a href="<?php echo htmlspecialchars($order['link']); ?>" target="_blank" class="text-xs font-medium text-emerald-600 hover:text-emerald-700 break-all hover:underline">
+                            <a href="<?php echo htmlspecialchars($order['link']); ?>" target="_blank" class="text-xs font-medium text-primary-600 hover:text-primary-700 break-all hover:underline">
                                 <?php echo htmlspecialchars(substr($order['link'], 0, 40) . '...'); ?>
                             </a>
                         </div>
@@ -152,7 +152,7 @@ include '../include/user-layout-start.php';
                         </div>
                         
                         <!-- Action -->
-                        <a href="../order-details/?id=<?php echo $order['id']; ?>" class="w-full inline-flex items-center justify-center px-4 py-2 bg-slate-100 text-slate-600 text-xs font-bold rounded-lg hover:bg-emerald-600 hover:text-white transition-all duration-200">
+                        <a href="../order-details/?id=<?php echo $order['id']; ?>" class="w-full inline-flex items-center justify-center px-4 py-2 bg-slate-100 text-slate-600 text-xs font-bold rounded-lg hover:bg-primary-600 hover:text-white transition-all duration-200">
                             View Details
                         </a>
                     </div>
@@ -165,7 +165,7 @@ include '../include/user-layout-start.php';
                     <h3 class="text-sm font-medium text-gray-900">No orders found</h3>
                     <p class="text-xs text-gray-500 mt-1">Get started by creating a new order.</p>
                     <div class="mt-4">
-                        <a href="../order/" class="inline-flex items-center px-3 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors">
+                        <a href="../order/" class="inline-flex items-center px-3 py-2 text-xs font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors">
                             Create New Order
                         </a>
                     </div>
@@ -201,7 +201,7 @@ include '../include/user-layout-start.php';
                                      </div>
                                  </td>
                                 <td class="px-4 lg:px-6 py-4 hidden lg:table-cell">
-                                    <a href="<?php echo htmlspecialchars($order['link']); ?>" target="_blank" class="text-xs font-medium text-emerald-600 hover:text-emerald-700 hover:underline max-w-xs truncate block" title="<?php echo htmlspecialchars($order['link']); ?>">
+                                    <a href="<?php echo htmlspecialchars($order['link']); ?>" target="_blank" class="text-xs font-medium text-primary-600 hover:text-primary-700 hover:underline max-w-xs truncate block" title="<?php echo htmlspecialchars($order['link']); ?>">
                                         <?php echo htmlspecialchars(substr($order['link'], 0, 40)); ?>...
                                     </a>
                                 </td>
@@ -214,7 +214,7 @@ include '../include/user-layout-start.php';
                                 <td class="px-4 lg:px-6 py-4 whitespace-nowrap">
                                     <?php 
                                     $statusClasses = [
-                                        'completed' => 'bg-emerald-50 text-emerald-700 border-emerald-100',
+                                        'completed' => 'bg-primary-50 text-primary-700 border-primary-100',
                                         'pending' => 'bg-amber-50 text-amber-700 border-amber-100',
                                         'processing' => 'bg-blue-50 text-blue-700 border-blue-100',
                                         'canceled' => 'bg-rose-50 text-rose-700 border-rose-100',
@@ -230,7 +230,7 @@ include '../include/user-layout-start.php';
                                     <?php echo date('M d, Y', strtotime($order['created_at'])); ?>
                                 </td>
                                 <td class="px-4 lg:px-6 py-4 whitespace-nowrap text-right text-xs font-bold">
-                                    <a href="../order-details/?id=<?php echo $order['id']; ?>" class="inline-flex items-center px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg hover:bg-emerald-600 hover:text-white transition-all duration-200 font-bold">
+                                    <a href="../order-details/?id=<?php echo $order['id']; ?>" class="inline-flex items-center px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg hover:bg-primary-600 hover:text-white transition-all duration-200 font-bold">
                                         View
                                     </a>
                                 </td>
@@ -245,7 +245,7 @@ include '../include/user-layout-start.php';
                                 <h3 class="text-sm font-medium text-gray-900">No orders found</h3>
                                 <p class="text-xs text-gray-500 mt-1">Get started by creating a new order.</p>
                                 <div class="mt-4">
-                                    <a href="../order/" class="inline-flex items-center px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors">
+                                    <a href="../order/" class="inline-flex items-center px-4 py-2 text-xs font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors">
                                         Create New Order
                                     </a>
                                 </div>
@@ -273,7 +273,7 @@ include '../include/user-layout-start.php';
 
                     <!-- Numbers -->
                     <?php for ($i = max(1, $page - 2); $i <= min($totalPages, $page + 2); $i++): ?>
-                    <a href="?page=<?php echo $i; ?><?php echo $statusFilter ? "&status=$statusFilter" : ''; ?>" class="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-bold transition-colors <?php echo $i === $page ? 'bg-emerald-600 text-white border border-emerald-600' : 'bg-white text-slate-600 border border-slate-300 hover:bg-slate-50'; ?>">
+                    <a href="?page=<?php echo $i; ?><?php echo $statusFilter ? "&status=$statusFilter" : ''; ?>" class="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-bold transition-colors <?php echo $i === $page ? 'bg-primary-600 text-white border border-primary-600' : 'bg-white text-slate-600 border border-slate-300 hover:bg-slate-50'; ?>">
                         <?php echo $i; ?>
                     </a>
                     <?php endfor; ?>

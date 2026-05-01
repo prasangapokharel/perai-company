@@ -40,10 +40,10 @@ include 'admin-header.php';
             <p class="text-slate-500 font-medium mt-1">System-wide performance and statistics.</p>
         </div>
         <div class="flex gap-3">
-            <a href="import/" class="inline-flex items-center px-6 py-3 bg-white border border-slate-200 text-sm font-bold rounded-xl text-slate-600 hover:text-emerald-600 hover:border-emerald-200 transition-all shadow-sm">
+            <a href="import/" class="inline-flex items-center px-6 py-3 bg-white border border-slate-200 text-sm font-bold rounded-xl text-slate-600 hover:text-primary-600 hover:border-primary-200 transition-all shadow-sm">
                 Import Services
             </a>
-            <a href="orders/" class="inline-flex items-center px-6 py-3 bg-emerald-600 text-white text-sm font-bold rounded-xl hover:bg-emerald-700 shadow-lg shadow-emerald-200 transition-all">
+            <a href="orders/" class="inline-flex items-center px-6 py-3 bg-primary-600 text-white text-sm font-bold rounded-xl hover:bg-primary-700 shadow-lg shadow-emerald-200 transition-all">
                 Manage Orders
             </a>
         </div>
@@ -54,11 +54,11 @@ include 'admin-header.php';
         <!-- Stat Card -->
         <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden group">
             <div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
-                <svg class="w-16 h-16 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" /></svg>
+                <svg class="w-16 h-16 text-primary-500" fill="currentColor" viewBox="0 0 20 20"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" /></svg>
             </div>
             <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Total Users</p>
             <p class="text-3xl font-black text-slate-900"><?php echo number_format($totalUsers); ?></p>
-            <div class="mt-4 flex items-center text-xs font-bold text-emerald-600 bg-emerald-50 w-fit px-2 py-1 rounded-lg">
+            <div class="mt-4 flex items-center text-xs font-bold text-primary-600 bg-primary-50 w-fit px-2 py-1 rounded-lg">
                 <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" /></svg>
                 <?php echo $todayRegisteredUsers; ?> today
             </div>
@@ -66,7 +66,7 @@ include 'admin-header.php';
 
         <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden group">
             <div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
-                <svg class="w-16 h-16 text-emerald-500" fill="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                <svg class="w-16 h-16 text-primary-500" fill="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
             </div>
             <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Total Orders</p>
             <p class="text-3xl font-black text-slate-900"><?php echo number_format($totalOrders); ?></p>
@@ -77,10 +77,10 @@ include 'admin-header.php';
 
         <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden group">
             <div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
-                <svg class="w-16 h-16 text-emerald-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <svg class="w-16 h-16 text-primary-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             </div>
             <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Total Revenue</p>
-            <p class="text-3xl font-black text-emerald-600"><?php echo formatCurrency($totalRevenue); ?></p>
+            <p class="text-3xl font-black text-primary-600"><?php echo formatCurrency($totalRevenue); ?></p>
             <div class="mt-4 flex items-center text-xs font-bold text-slate-400 bg-slate-50 w-fit px-2 py-1 rounded-lg">
                 Completed orders
             </div>
@@ -88,7 +88,7 @@ include 'admin-header.php';
 
         <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden group">
             <div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
-                <svg class="w-16 h-16 text-emerald-500" fill="currentColor" viewBox="0 0 24 24"><path d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                <svg class="w-16 h-16 text-primary-500" fill="currentColor" viewBox="0 0 24 24"><path d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
             </div>
             <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Funds Added</p>
             <p class="text-3xl font-black text-slate-900"><?php echo formatCurrency($totalFundsAdded); ?></p>
@@ -104,7 +104,7 @@ include 'admin-header.php';
         <div class="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
             <div class="p-8 border-b border-slate-50 flex justify-between items-center">
                 <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest">Recent Activity</h3>
-                <a href="orders/" class="text-xs font-bold text-emerald-600 hover:text-emerald-700">View All Orders</a>
+                <a href="orders/" class="text-xs font-bold text-primary-600 hover:text-primary-700">View All Orders</a>
             </div>
             
             <div class="overflow-x-auto">
@@ -131,7 +131,7 @@ include 'admin-header.php';
                                     <td class="px-8 py-5">
                                         <?php 
                                         $statusClasses = [
-                                            'completed' => 'bg-emerald-50 text-emerald-700 border-emerald-100',
+                                            'completed' => 'bg-primary-50 text-primary-700 border-primary-100',
                                             'pending' => 'bg-amber-50 text-amber-700 border-amber-100',
                                             'processing' => 'bg-blue-50 text-blue-700 border-blue-100',
                                             'canceled' => 'bg-rose-50 text-rose-700 border-rose-100',
@@ -163,7 +163,7 @@ include 'admin-header.php';
             <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-8">
                 <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest mb-6">Action Center</h3>
                 <div class="space-y-3">
-                    <a href="approvals/" class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-emerald-200 hover:bg-emerald-50 transition-all group">
+                    <a href="approvals/" class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-primary-200 hover:bg-primary-50 transition-all group">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -173,12 +173,12 @@ include 'admin-header.php';
                                 <p class="text-[10px] font-bold text-slate-400 uppercase"><?php echo $pendingFunds; ?> Pending Requests</p>
                             </div>
                         </div>
-                        <svg class="w-4 h-4 text-slate-300 group-hover:text-emerald-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" /></svg>
+                        <svg class="w-4 h-4 text-slate-300 group-hover:text-primary-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" /></svg>
                     </a>
 
-                    <a href="users/" class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-emerald-200 hover:bg-emerald-50 transition-all group">
+                    <a href="users/" class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-primary-200 hover:bg-primary-50 transition-all group">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                            <div class="w-10 h-10 rounded-xl bg-primary-100 text-primary-600 flex items-center justify-center">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                             </div>
                             <div>
@@ -186,7 +186,7 @@ include 'admin-header.php';
                                 <p class="text-[10px] font-bold text-slate-400 uppercase">Manage Accounts</p>
                             </div>
                         </div>
-                        <svg class="w-4 h-4 text-slate-300 group-hover:text-emerald-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" /></svg>
+                        <svg class="w-4 h-4 text-slate-300 group-hover:text-primary-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" /></svg>
                     </a>
                 </div>
             </div>
@@ -195,11 +195,11 @@ include 'admin-header.php';
                 <div class="absolute top-0 right-0 p-8 opacity-10">
                     <svg class="w-24 h-24" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                 </div>
-                <h3 class="text-sm font-black text-emerald-400 uppercase tracking-widest mb-2">System Health</h3>
+                <h3 class="text-sm font-black text-primary-400 uppercase tracking-widest mb-2">System Health</h3>
                 <p class="text-slate-400 text-xs font-medium leading-relaxed mb-6">All systems are operational. Last sync with providers was 4 minutes ago.</p>
                 <div class="flex items-center gap-2">
-                    <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                    <span class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500">Live Status</span>
+                    <div class="w-2 h-2 rounded-full bg-primary-500 animate-pulse"></div>
+                    <span class="text-[10px] font-black uppercase tracking-[0.2em] text-primary-500">Live Status</span>
                 </div>
             </div>
         </div>

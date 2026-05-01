@@ -223,7 +223,7 @@ include 'admin-header.php';
     <!-- Period Selector -->
     <div class="flex flex-wrap gap-2">
         <?php foreach ($validPeriods as $p): ?>
-            <a href="?period=<?php echo $p; ?>" class="px-4 py-2 rounded-lg font-semibold text-sm transition-all <?php echo $period === $p ? 'bg-emerald-600 text-white' : 'bg-white border border-slate-200 text-slate-700 hover:border-emerald-300'; ?>">
+            <a href="?period=<?php echo $p; ?>" class="px-4 py-2 rounded-lg font-semibold text-sm transition-all <?php echo $period === $p ? 'bg-primary-600 text-white' : 'bg-white border border-slate-200 text-slate-700 hover:border-primary-300'; ?>">
                 <?php echo ucfirst($p); ?>
             </a>
         <?php endforeach; ?>
@@ -234,8 +234,8 @@ include 'admin-header.php';
         <!-- Completed Deposits -->
         <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
             <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Completed Deposits</p>
-            <p class="text-3xl font-black text-emerald-600"><?php echo formatCurrency($totalDeposits['total'] ?? 0); ?></p>
-            <div class="mt-4 flex items-center text-xs font-bold text-emerald-600 bg-emerald-50 w-fit px-2 py-1 rounded-lg">
+            <p class="text-3xl font-black text-primary-600"><?php echo formatCurrency($totalDeposits['total'] ?? 0); ?></p>
+            <div class="mt-4 flex items-center text-xs font-bold text-primary-600 bg-primary-50 w-fit px-2 py-1 rounded-lg">
                 <?php echo $completedCount; ?> transactions
             </div>
         </div>
@@ -254,7 +254,7 @@ include 'admin-header.php';
             <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Success Rate</p>
             <p class="text-3xl font-black text-slate-900"><?php echo number_format($successRate, 1); ?>%</p>
             <div class="mt-4 w-full bg-slate-100 rounded-full h-2">
-                <div class="bg-emerald-500 h-2 rounded-full" style="width: <?php echo $successRate; ?>%;"></div>
+                <div class="bg-primary-500 h-2 rounded-full" style="width: <?php echo $successRate; ?>%;"></div>
             </div>
         </div>
 
@@ -308,7 +308,7 @@ include 'admin-header.php';
                                 <span class="font-bold text-slate-900"><?php echo htmlspecialchars($row['payment_method'] ?: 'Unknown'); ?></span>
                             </td>
                             <td class="py-4 px-4 text-right text-slate-700"><?php echo $row['count']; ?></td>
-                            <td class="py-4 px-4 text-right font-bold text-emerald-600"><?php echo formatCurrency($row['total']); ?></td>
+                            <td class="py-4 px-4 text-right font-bold text-primary-600"><?php echo formatCurrency($row['total']); ?></td>
                             <td class="py-4 px-4 text-right text-slate-700"><?php echo number_format($percentage, 1); ?>%</td>
                         </tr>
                     <?php endwhile; ?>
@@ -340,7 +340,7 @@ include 'admin-header.php';
                                 </div>
                             </td>
                             <td class="py-4 px-4 text-right text-slate-700"><?php echo $row['transactions']; ?></td>
-                            <td class="py-4 px-4 text-right font-bold text-emerald-600"><?php echo formatCurrency($row['total']); ?></td>
+                            <td class="py-4 px-4 text-right font-bold text-primary-600"><?php echo formatCurrency($row['total']); ?></td>
                             <td class="py-4 px-4 text-right text-slate-700"><?php echo formatCurrency($row['total'] / $row['transactions']); ?></td>
                         </tr>
                     <?php endwhile; ?>
@@ -371,11 +371,11 @@ include 'admin-header.php';
                                     <p class="text-xs text-slate-500"><?php echo htmlspecialchars($row['email']); ?></p>
                                 </div>
                             </td>
-                            <td class="py-4 px-4 font-bold text-emerald-600"><?php echo formatCurrency($row['amount']); ?></td>
+                            <td class="py-4 px-4 font-bold text-primary-600"><?php echo formatCurrency($row['amount']); ?></td>
                             <td class="py-4 px-4">
                                 <?php 
                                 $statusColors = [
-                                    'completed' => 'bg-emerald-100 text-emerald-800',
+                                    'completed' => 'bg-primary-100 text-primary-800',
                                     'pending' => 'bg-amber-100 text-amber-800',
                                     'canceled' => 'bg-red-100 text-red-800',
                                 ];
