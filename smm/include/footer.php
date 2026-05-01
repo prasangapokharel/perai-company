@@ -6,7 +6,7 @@
             <div class="space-y-6">
                 <div class="flex items-center">
                     <a href="/">
-                        <img src="/assets/images/1.png" alt="OkxSmm Logo" class="h-12 w-auto">
+                        <img src="/assets/logo.png" alt="OkxSmm Logo" class="h-12 w-auto">
                     </a>
                 </div>
                 <p class="text-sm leading-relaxed text-slate-400">
