@@ -33,7 +33,7 @@ try {
 <title>OkxSmm — World's Most Professional SMM Services</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 <style>
 /* ─── Reset & Base ──────────────────────────────────────────── */
@@ -57,7 +57,7 @@ try {
 }
 html { scroll-behavior: smooth; }
 body {
-    font-family: 'Figtree', sans-serif;
+    font-family: 'Roboto', sans-serif;
     background: var(--bg);
     color: var(--text);
     overflow-x: hidden;
