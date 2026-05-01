@@ -176,7 +176,7 @@ include '../../include/user-layout-start.php';
                 <div class="flex items-end justify-end">
                     <div class="text-right">
                         <p class="text-sm text-slate-500 font-bold uppercase tracking-wider mb-2">Amount to Pay</p>
-                        <p class="text-4xl font-bold text-primary-600">$<?php echo formatCurrency($amount); ?></p>
+                        <p class="text-4xl font-bold text-primary-600"><?php echo formatCurrency($amount); ?></p>
                         <p class="text-xs text-slate-400 mt-2">Currency: <?php echo OXAPAY_DEFAULT_CURRENCY; ?></p>
                     </div>
                 </div>
@@ -184,14 +184,14 @@ include '../../include/user-layout-start.php';
             
             <!-- Payment Button -->
              <div class="flex flex-col gap-4">
-                 <a href="<?php echo htmlspecialchars($paymentUrl); ?>" target="_blank" class="w-full text-white font-bold py-4 px-6 rounded-xl transition flex items-center justify-center gap-2 text-lg" style="background-color: <?php echo OXAPAY_PRIMARY_COLOR; ?>; ">
-                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                     </svg>
-                     <?php echo htmlspecialchars($paymentMessages['pay_button']); ?>
-                 </a>
-                 <p class="text-center text-xs text-slate-500"><?php echo htmlspecialchars($paymentMessages['info']); ?></p>
-             </div>
+                  <a href="<?php echo htmlspecialchars($paymentUrl); ?>" target="_blank" class="w-full text-white font-bold py-2 px-4 rounded-lg transition inline-flex items-center justify-center gap-2 text-sm" style="background-color: <?php echo OXAPAY_PRIMARY_COLOR; ?>; ">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      <?php echo htmlspecialchars($paymentMessages['pay_button']); ?>
+                  </a>
+                  <p class="text-center text-xs text-slate-500"><?php echo htmlspecialchars($paymentMessages['info']); ?></p>
+              </div>
          </div>
         
         <!-- Payment Info -->
@@ -224,13 +224,10 @@ include '../../include/user-layout-start.php';
                 <div class="flex items-end justify-end">
                     <div class="text-right">
                         <p class="text-sm text-slate-500 font-bold uppercase tracking-wider mb-2">Amount to Pay</p>
-                        <p class="text-4xl font-bold text-primary-600">$<?php echo formatCurrency($amount); ?></p>
+                        <p class="text-4xl font-bold text-primary-600"><?php echo formatCurrency($amount); ?></p>
                         <p class="text-xs text-slate-400 mt-2">Currency: <?php echo OXAPAY_DEFAULT_CURRENCY; ?></p>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Generating Message -->
             <div class="text-center py-8">
                 <div class="inline-block">
                     <svg class="animate-spin h-12 w-12 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
