@@ -201,40 +201,48 @@ try {
             $categoryId = null;
             error_log("    DEBUG: serviceCategoriesTableExists=$serviceCategoriesTableExists, hasCategoryIdColumn=$hasCategoryIdColumn");
             
-            if ($serviceCategoriesTableExists && $hasCategoryIdColumn) {
-                $catResult = $conn->query("SELECT id FROM service_categories WHERE name = '$categoryName'");
-                if ($catResult && $catResult->num_rows > 0) {
-                    $categoryId = (int) $catResult->fetch_assoc()['id'];
-                    error_log("    Found existing category: '$categoryName' with id=$categoryId");
-                } else {
-                    if ($conn->query("INSERT INTO service_categories (name) VALUES ('$categoryName')")) {
-                        $categoryId = (int) $conn->insert_id;
-                        error_log("    Created NEW category: '$categoryName' with id=$categoryId");
+            try {
+                if ($serviceCategoriesTableExists && $hasCategoryIdColumn) {
+                    error_log("    Looking up category: '$categoryName'");
+                    $catResult = $conn->query("SELECT id FROM service_categories WHERE name = '$categoryName'");
+                    if ($catResult === false) {
+                        error_log("    ERROR in SELECT: " . $conn->error);
+                    } elseif ($catResult->num_rows > 0) {
+                        $categoryId = (int) $catResult->fetch_assoc()['id'];
+                        error_log("    Found existing category: '$categoryName' with id=$categoryId");
                     } else {
-                        error_log("    FAILED to create category: " . $conn->error);
+                        error_log("    Category not found, creating: '$categoryName'");
+                        if ($conn->query("INSERT INTO service_categories (name) VALUES ('$categoryName')")) {
+                            $categoryId = (int) $conn->insert_id;
+                            error_log("    Created NEW category: '$categoryName' with id=$categoryId");
+                        } else {
+                            error_log("    FAILED to create category: " . $conn->error);
+                        }
                     }
-                }
-            } else {
-                error_log("    SKIPPING category logic: serviceCategoriesTableExists=$serviceCategoriesTableExists, hasCategoryIdColumn=$hasCategoryIdColumn");
-            }
-            
-            // If still no category ID, create a default one
-            if (!$categoryId && $hasCategoryIdColumn) {
-                error_log("    WARNING: No category_id found, creating default category");
-                if ($conn->query("INSERT INTO service_categories (name) VALUES ('Uncategorized')")) {
-                    $categoryId = (int) $conn->insert_id;
-                    error_log("    Created default 'Uncategorized' with id=$categoryId");
                 } else {
-                    // Try to use existing Uncategorized
-                    $uncatResult = $conn->query("SELECT id FROM service_categories WHERE name = 'Uncategorized' LIMIT 1");
-                    if ($uncatResult && $uncatResult->num_rows > 0) {
-                        $categoryId = (int) $uncatResult->fetch_assoc()['id'];
-                        error_log("    Using existing 'Uncategorized' with id=$categoryId");
+                    error_log("    SKIPPING category logic: serviceCategoriesTableExists=$serviceCategoriesTableExists, hasCategoryIdColumn=$hasCategoryIdColumn");
+                }
+                
+                // If still no category ID, create a default one
+                if (!$categoryId && $hasCategoryIdColumn) {
+                    error_log("    WARNING: No category_id found, creating default category");
+                    if ($conn->query("INSERT INTO service_categories (name) VALUES ('Uncategorized')")) {
+                        $categoryId = (int) $conn->insert_id;
+                        error_log("    Created default 'Uncategorized' with id=$categoryId");
+                    } else {
+                        // Try to use existing Uncategorized
+                        $uncatResult = $conn->query("SELECT id FROM service_categories WHERE name = 'Uncategorized' LIMIT 1");
+                        if ($uncatResult && $uncatResult->num_rows > 0) {
+                            $categoryId = (int) $uncatResult->fetch_assoc()['id'];
+                            error_log("    Using existing 'Uncategorized' with id=$categoryId");
+                        }
                     }
                 }
+                
+                error_log("    Final category_id=$categoryId for '$categoryName'");
+            } catch (Exception $e) {
+                error_log("    EXCEPTION in category logic: " . $e->getMessage());
             }
-            
-            error_log("    Final category_id=$categoryId for '$categoryName'");
             
             // Calculate price with markup
             $price = floatval($service['rate'] ?? 0) * (1 + $markup / 100);
