@@ -12,7 +12,7 @@ $keywords = "smmpanel,smmsafe,cheapest followers,cheapest followers for instagra
 $metaDescription = "Buy Instagram followers, TikTok likes, YouTube views at SMMV Shop! Cheapest SMM panel & crypto news on Bitcoin, Binance, Pi Coin. Boost your social media now.";
 
 // Fallback page title if not set
-$pageTitle = isset($pageTitle) ? $pageTitle : 'SMMV Shop - Cheapest SMM Panel & Crypto Services';
+$pageTitle = isset($pageTitle) ? $pageTitle : 'SMMV Shop - Cheapest OkxSmm & Crypto Services';
 
 // Keyword-rich description for SEO (to be output in HTML)
 $seoDescription = <<<EOD
@@ -40,7 +40,7 @@ EOD;
 <meta property="og:title" content="<?php echo htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8'); ?>">
 <meta property="og:description" content="<?php echo htmlspecialchars($metaDescription, ENT_QUOTES, 'UTF-8'); ?>">
 <meta property="og:image" content="<?php echo $baseUrl; ?>ogimage.jpg">
-<meta property="og:image:alt" content="SMMV Shop - Cheapest SMM Panel & Crypto Services">
+<meta property="og:image:alt" content="SMMV Shop - Cheapest OkxSmm & Crypto Services">
 <meta property="og:site_name" content="SMMV Shop">
 <meta property="og:locale" content="en_US">
 

@@ -32,7 +32,7 @@ $pageTitle = $pageTitle ?? 'Dashboard';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($pageTitle); ?> - SMM Panel</title>
+    <title><?php echo htmlspecialchars($pageTitle); ?> - OkxSmm</title>
     <!-- Ubuntu & Bebas Neue Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -92,14 +92,14 @@ tailwind.config = {
             transition: all 0.15s ease-in-out;
         }
         
-        .nav-item:hover {
-            color: #059669;
-            background: #f0fdf4;
+         .nav-item:hover {
+            color: #3b82f6;
+            background: #eff6ff;
         }
         
         .nav-item.active {
-            color: #059669;
-            background: #ecfdf5;
+            color: #3b82f6;
+            background: #dbeafe;
             font-weight: 600;
         }
     </style>
@@ -112,7 +112,7 @@ tailwind.config = {
                 <!-- Logo -->
                 <div class="flex-shrink-0 flex items-center">
                     <a href="/dashboard" class="flex items-center gap-2">
-                        <img src="/assets/logo.png" alt="SMM Panel Logo" class="h-10 w-auto">
+                        <img src="/assets/logo.png" alt="OkxSmm Logo" class="h-10 w-auto">
                         <span class="text-xl font-bold text-slate-900 tracking-tight">SMM<span class="text-primary-500">Panel</span></span>
                     </a>
                 </div>

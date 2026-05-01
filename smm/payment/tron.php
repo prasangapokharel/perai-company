@@ -86,7 +86,7 @@ include '../include/user-layout-start.php';
     }
     
     .btn-primary:hover {
-        background: #059669;
+        background: #2563eb;
     }
     
     .form-input {
@@ -97,7 +97,7 @@ include '../include/user-layout-start.php';
     }
     
     .form-input:focus {
-        border-color: #10b981;
+        border-color: #3b82f6;
         box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
         outline: none;
     }
@@ -111,7 +111,7 @@ include '../include/user-layout-start.php';
     }
     
     .tron-address-box {
-        background: #f0fdf4;
+        background: #eff6ff;
         border: 1px solid #dcfce7;
         border-radius: 12px;
         padding: 1rem;
@@ -121,9 +121,9 @@ include '../include/user-layout-start.php';
     }
     
     .copy-btn {
-        background: #ecfdf5;
+        background: #dbeafe;
         border: 1px solid #bbf7d0;
-        color: #10b981;
+        color: #3b82f6;
         padding: 0.5rem 1rem;
         border-radius: 8px;
         cursor: pointer;
@@ -132,7 +132,7 @@ include '../include/user-layout-start.php';
     }
     
     .copy-btn:hover {
-        background: #d1fae5;
+        background: #bfdbfe;
     }
 </style>
 

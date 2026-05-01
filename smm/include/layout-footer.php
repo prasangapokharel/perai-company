@@ -6,7 +6,7 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                 <div class="col-span-1 md:col-span-2">
                     <div class="flex items-center gap-2 mb-4">
-                        <img src="/assets/logo.png" alt="SMM Panel Logo" class="h-8 w-auto">
+                        <img src="/assets/logo.png" alt="OkxSmm Logo" class="h-8 w-auto">
                         <span class="text-xl font-bold text-gray-900">SMM<span class="text-primary-600">Panel</span></span>
                     </div>
                     <p class="text-gray-500 text-sm max-w-sm mb-6">
@@ -45,7 +45,7 @@
             
             <div class="border-t border-gray-100 pt-8 mt-8 flex flex-col md:flex-row justify-between items-center gap-4">
                 <p class="text-sm text-gray-500 text-center md:text-left">
-                    &copy; <?php echo date('Y'); ?> SMM Panel. All rights reserved.
+                    &copy; <?php echo date('Y'); ?> OkxSmm. All rights reserved.
                 </p>
                 <div class="flex items-center gap-6">
                     <span class="text-xs text-gray-400">Secure Payment</span>

@@ -6,7 +6,7 @@
             <div class="space-y-6">
                 <div class="flex items-center">
                     <a href="/">
-                        <img src="/assets/images/1.png" alt="SMM Panel Logo" class="h-12 w-auto">
+                        <img src="/assets/images/1.png" alt="OkxSmm Logo" class="h-12 w-auto">
                     </a>
                 </div>
                 <p class="text-sm leading-relaxed text-slate-400">
@@ -56,7 +56,7 @@
         </div>
         
         <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
-            <p class="text-slate-500 text-sm">© <?php echo date('Y'); ?> SMM Panel. All rights reserved.</p>
+            <p class="text-slate-500 text-sm">© <?php echo date('Y'); ?> OkxSmm. All rights reserved.</p>
             <div class="flex gap-6">
                 <a class="text-slate-400 hover:text-primary transition-colors text-sm" href="/terms/">Privacy Policy</a>
                 <a class="text-slate-400 hover:text-primary transition-colors text-sm" href="/terms/">Terms of Service</a>
