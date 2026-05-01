@@ -7,7 +7,7 @@
                 <div class="col-span-1 md:col-span-2">
                     <div class="flex items-center gap-2 mb-4">
                         <img src="/assets/logo.png" alt="OkxSmm Logo" class="h-8 w-auto">
-                        <span class="text-xl font-bold text-gray-900">SMM<span class="text-primary-600">Panel</span></span>
+                        <span class="text-xl font-bold text-gray-900">OkxSmm</span>
                     </div>
                     <p class="text-gray-500 text-sm max-w-sm mb-6">
                         The #1 destination for social media marketing services. Boost your presence with our premium, high-quality services.

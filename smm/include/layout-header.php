@@ -113,7 +113,7 @@ tailwind.config = {
                 <div class="flex-shrink-0 flex items-center">
                     <a href="/dashboard" class="flex items-center gap-2">
                         <img src="/assets/logo.png" alt="OkxSmm Logo" class="h-10 w-auto">
-                        <span class="text-xl font-bold text-slate-900 tracking-tight">SMM<span class="text-primary-500">Panel</span></span>
+                        <span class="text-xl font-bold text-slate-900 tracking-tight">OkxSmm</span>
                     </a>
                 </div>
 
