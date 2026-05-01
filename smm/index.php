@@ -190,34 +190,14 @@ try {
             </div>
         </div>
         
-        <!-- Right Side: Mystical Illustration -->
+        <!-- Right Side: Professional Image -->
         <div class="relative flex justify-center items-center">
             <!-- Large Background Glow -->
             <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary-500/10 rounded-full blur-[100px] -z-10"></div>
             
             <!-- Image Container -->
             <div class="relative w-full max-w-lg">
-                <img src="/assets/images/hero-section.jpg" alt="OkxSmm Professional Services" class="w-full h-auto rounded-[2.5rem] shadow-2xl border-4 border-white/80 object-cover">
-                
-                <!-- Glass Stats Card (Floating) -->
-                <div class="absolute bottom-10 -left-6 glass p-5 rounded-2xl shadow-2xl flex items-center gap-4 max-w-[220px] animate-float">
-                    <div class="w-12 h-12 rounded-xl bg-primary-500/10 flex items-center justify-center">
-                        <span class="material-icons text-primary-500">check_circle</span>
-                    </div>
-                    <div>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Orders Done</p>
-                        <p class="text-xl font-black text-slate-900"><?php echo number_format($total_orders); ?>+</p>
-                    </div>
-                </div>
-                
-                <!-- Floating Badge -->
-                <div class="absolute top-10 right-0 glass px-4 py-3 rounded-2xl border-primary-100 flex items-center gap-3 shadow-lg">
-                    <div class="flex -space-x-2">
-                        <div class="w-8 h-8 rounded-full border-2 border-white bg-primary-50 flex items-center justify-center text-[10px] font-bold text-primary-600">JD</div>
-                        <div class="w-8 h-8 rounded-full border-2 border-white bg-primary-50 flex items-center justify-center text-[10px] font-bold text-primary-600">AS</div>
-                    </div>
-                    <p class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Joined <span class="text-primary-500">Now</span></p>
-                </div>
+                <img src="/assets/images/hero-card.jpg" alt="OkxSmm Professional Team" class="w-full h-auto rounded-[2.5rem] shadow-2xl border-4 border-white/80 object-cover">
             </div>
         </div>
     </div>
