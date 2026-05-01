@@ -240,11 +240,18 @@ try {
             error_log("  Checking if service exists in DB...");
             
             // Check if service exists
-            $existingService = $conn->query(
-                "SELECT id FROM services 
+            $checkQuery = "SELECT id FROM services 
                  WHERE api_service_id = $apiServiceId 
-                 AND api_provider_id = $providerId"
-            )->fetch_assoc();
+                 AND api_provider_id = $providerId";
+            error_log("  Check Query: $checkQuery");
+            $result = $conn->query($checkQuery);
+            if ($result === false) {
+                error_log("  ✗ QUERY ERROR: " . $conn->error);
+                $errors++;
+                continue;
+            }
+            $existingService = $result->fetch_assoc();
+            error_log("  Exists in DB? " . ($existingService ? "YES (ID=" . $existingService['id'] . ")" : "NO"));
             
             if ($existingService) {
                 // Update existing service
