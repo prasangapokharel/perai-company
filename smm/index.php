@@ -511,7 +511,7 @@ try {
                 <div class="p-6 bg-white">
                     <h3 class="text-xl font-bold mb-3 group-hover:text-primary transition-colors text-slate-900">Social Media & Business</h3>
                     <p class="text-slate-600 text-sm mb-6 line-clamp-3">
-                        The intersection of business and social presence. How top brands leverage SMM panels to maintain their influence.
+                        The intersection of business and social presence. How top brands leverage OkxSmms to maintain their influence.
                     </p>
                     <a class="inline-flex items-center text-primary font-semibold hover:gap-2 transition-all" href="#">
                         Read More <span class="material-icons text-sm ml-1">arrow_forward</span>

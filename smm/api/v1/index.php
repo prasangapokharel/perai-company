@@ -1,6 +1,6 @@
 <?php
 /**
- * SMM Panel API v1 Endpoint
+ * OkxSmm API v1 Endpoint
  * 
  * HTTP METHOD: POST
  * API URL: http://localhost:8000/api/v1/

@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $pageTitle; ?> - SMM Panel</title>
+    <title><?php echo $pageTitle; ?> - OkxSmm</title>
     <?php include '../include/meta.php'; ?>
     <?php include '../include/favicon.php'; ?>
 
@@ -82,15 +82,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
 </head>
 <body class="h-full font-sans antialiased text-gray-900">
-    <div class="min-h-screen flex">
+    <div class="min-h-screen flex p-10  rounded-2xl overflow-hidden shadow-lg bg-white">
         <!-- Left Section: Form -->
-        <div class="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white relative">
+        <div class="w-full lg:w-1/2 flex items-center justify-center p-8 relative">
             
-            <div class="max-w-md w-full relative z-10">
+            <div class="max-w-md w-full relative z-10 p-6">
                 <!-- Logo -->
                 <div class="text-center mb-10">
                     <a href="../" class="inline-flex items-center gap-2 mb-8">
-                        <img src="../assets/logo.png" alt="SMM Panel Logo" class="h-10 w-auto">
+                        <img src="../assets/logo.png" alt="OkxSmm Logo" class="h-10 w-auto">
                         <span class="text-2xl font-bold text-gray-900 tracking-tight">SMM<span class="text-primary-600">Panel</span></span>
                     </a>
                     <h1 class="text-3xl font-bold text-gray-900 mb-3">Welcome Back</h1>
@@ -152,20 +152,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         
         <!-- Right Section: Video Background -->
-        <div class="hidden lg:block relative w-1/2 bg-gray-900 overflow-hidden">
+        <div class="hidden lg:block relative w-1/2 bg-gray-900 overflow-hidden rounded-2xl">
             <!-- Video Background -->
             <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover">
-                <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260422_112520_ee819691-f2e8-4c54-bb77-3fb72c84eaa5.mp4" type="video/mp4">
+                <source src="/assets/video/login.mp4" type="video/mp4">
                 Your browser does not support HTML5 video.
             </video>
-            <!-- Minimal overlay for text contrast -->
+            <!-- Minimal overlay for contrast -->
             <div class="absolute inset-0 bg-black/20 z-10"></div>
-            <!-- Content -->
-            <div class="absolute inset-0 z-20 flex flex-col justify-center px-12 text-white">
-                <h2 class="text-4xl font-bold mb-6">Boost Your Social Media Presence</h2>
-                <p class="text-lg text-blue-100 max-w-lg leading-relaxed">
-                    Join thousands of creators and businesses who use our platform to grow their audience and engagement organically.
-                </p>
+            <!-- Content moved to bottom to avoid top text over video -->
+            <div class="absolute inset-0 z-20 flex flex-col justify-end px-12 pb-12 text-white">
+                <div class="max-w-lg">
+                    <p class="text-lg text-blue-100 leading-relaxed">Join thousands of creators and businesses who use our platform to grow their audience and engagement.</p>
+                </div>
             </div>
         </div>
     </div>

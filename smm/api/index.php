@@ -47,7 +47,7 @@ include '../include/layout-header.php';
     <!-- Header -->
     <div class="mb-8">
         <h1 class="text-4xl font-bold text-gray-900">API Documentation</h1>
-        <p class="text-gray-500 mt-2">Complete reference for integrating with our SMM panel API</p>
+        <p class="text-gray-500 mt-2">Complete reference for integrating with our OkxSmm API</p>
     </div>
 
     <!-- API Key Section -->

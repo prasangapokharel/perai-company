@@ -10,7 +10,7 @@
                     </a>
                 </div>
                 <p class="text-sm leading-relaxed text-slate-400">
-                    The world's most trusted SMM panel. Elevate your digital presence with our growth tools and lightning-fast delivery.
+                    The world's most trusted OkxSmm. Elevate your digital presence with our growth tools and lightning-fast delivery.
                 </p>
                 <div class="flex items-center gap-4">
                     <a class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-primary hover:text-white transition-all" href="#">
