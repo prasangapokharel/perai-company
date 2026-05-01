@@ -410,13 +410,13 @@ if (revenueCtx) {
                 {
                     label: 'Revenue',
                     data: <?php echo json_encode($chartRevenue); ?>,
-                    borderColor: '#10b981',
+                    borderColor: '#3b82f6',
                     backgroundColor: 'rgba(16, 185, 129, 0.1)',
                     borderWidth: 2,
                     fill: true,
                     tension: 0.4,
                     pointRadius: 4,
-                    pointBackgroundColor: '#10b981',
+                    pointBackgroundColor: '#3b82f6',
                     pointBorderColor: '#fff',
                     pointBorderWidth: 2,
                 },
@@ -482,7 +482,7 @@ if (statusCtx) {
                     <?php echo $failedCount; ?>
                 ],
                 backgroundColor: [
-                    '#10b981',
+                    '#3b82f6',
                     '#f59e0b',
                     '#ef4444'
                 ],

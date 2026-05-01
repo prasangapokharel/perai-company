@@ -136,16 +136,16 @@ include '../include/admin-layout-start.php';
     .status-cancelled {
         background: #fee2e2;
         color: #991b1b;
-    }
-    
-    .stat-card {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        color: white;
-        border-radius: 16px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    
+     }
+     
+     .stat-card {
+         background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+         color: white;
+         border-radius: 16px;
+         padding: 1.5rem;
+         margin-bottom: 2rem;
+     }
+     
     .stat-label {
         opacity: 0.9;
         font-size: 0.875rem;
