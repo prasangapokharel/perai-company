@@ -108,11 +108,11 @@ $baseUrl = $isSubfolder ? '../' : '';
         <div class="px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center gap-4">
-                    <button id="sidebarToggle" class="p-2 rounded-lg text-slate-500 hover:bg-slate-50 md:hidden">
+                    <button id="sidebarToggle" class="p-2 rounded-xl text-slate-500 hover:bg-slate-50 md:hidden">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                     </button>
                     <a href="<?php echo $baseUrl; ?>dashboard/" class="flex items-center gap-2">
-                        <div class="bg-primary-500 text-white p-1.5 rounded-lg">
+                        <div class="bg-primary-500 text-white p-1.5 rounded-xl">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
                         </div>
                         <span class="text-xl font-black text-slate-900 tracking-tight uppercase">Admin<span class="text-primary-500">Core</span></span>

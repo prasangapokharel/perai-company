@@ -184,7 +184,7 @@ include '../../include/user-layout-start.php';
             
             <!-- Payment Button -->
              <div class="flex flex-col gap-4">
-                 <a href="<?php echo htmlspecialchars($paymentUrl); ?>" target="_blank" class="w-full text-white font-bold py-4 px-6 rounded-lg transition flex items-center justify-center gap-2 text-lg" style="background-color: <?php echo OXAPAY_PRIMARY_COLOR; ?>; ">
+                 <a href="<?php echo htmlspecialchars($paymentUrl); ?>" target="_blank" class="w-full text-white font-bold py-4 px-6 rounded-xl transition flex items-center justify-center gap-2 text-lg" style="background-color: <?php echo OXAPAY_PRIMARY_COLOR; ?>; ">
                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                      </svg>
@@ -247,17 +247,17 @@ include '../../include/user-layout-start.php';
         <div class="bg-blue-50 border border-blue-200 rounded-xl p-6">
             <h3 class="font-bold text-blue-900 mb-4">Why Choose OxaPay?</h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="p-4 bg-white rounded-lg">
+                <div class="p-4 bg-white rounded-xl">
                     <div class="text-2xl mb-2">🔒</div>
                     <p class="font-semibold text-slate-900">Secure</p>
                     <p class="text-sm text-slate-600">Enterprise-grade security</p>
                 </div>
-                <div class="p-4 bg-white rounded-lg">
+                <div class="p-4 bg-white rounded-xl">
                     <div class="text-2xl mb-2">⚡</div>
                     <p class="font-semibold text-slate-900">Fast</p>
                     <p class="text-sm text-slate-600">Instant payment processing</p>
                 </div>
-                <div class="p-4 bg-white rounded-lg">
+                <div class="p-4 bg-white rounded-xl">
                     <div class="text-2xl mb-2">🌐</div>
                     <p class="font-semibold text-slate-900">Global</p>
                     <p class="text-sm text-slate-600">50+ cryptocurrencies</p>

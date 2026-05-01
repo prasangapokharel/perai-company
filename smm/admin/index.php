@@ -40,13 +40,15 @@ include 'admin-header.php';
             <p class="text-slate-500 font-medium mt-1">System-wide performance and statistics.</p>
         </div>
         <div class="flex gap-3">
-            <a href="import/" class="inline-flex items-center px-6 py-3 bg-white border border-slate-200 text-sm font-bold rounded-xl text-slate-600 hover:text-primary-600 hover:border-primary-200 transition-all shadow-sm">
-                Import Services
-            </a>
-            <a href="orders/" class="inline-flex items-center px-6 py-3 bg-primary-600 text-white text-sm font-bold rounded-xl hover:bg-primary-700 shadow-lg shadow-emerald-200 transition-all">
-                Manage Orders
-            </a>
-        </div>
+             <a href="import/" class="inline-flex items-center px-6 py-3 bg-white border border-slate-200 text-sm font-bold rounded-xl text-slate-600 hover:text-primary-600 hover:border-primary-200 transition-all shadow-sm gap-2">
+                 <svg class="w-5 h-5 text-primary-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                 Import Services
+             </a>
+             <a href="orders/" class="inline-flex items-center px-6 py-3 bg-primary-600 text-white text-sm font-bold rounded-xl hover:bg-primary-700 shadow-lg transition-all gap-2">
+                 <svg class="w-5 h-5 text-primary-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                 Manage Orders
+             </a>
+         </div>
     </div>
 
     <!-- Stats Grid -->
@@ -58,7 +60,7 @@ include 'admin-header.php';
             </div>
             <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Total Users</p>
             <p class="text-3xl font-black text-slate-900"><?php echo number_format($totalUsers); ?></p>
-            <div class="mt-4 flex items-center text-xs font-bold text-primary-600 bg-primary-50 w-fit px-2 py-1 rounded-lg">
+            <div class="mt-4 flex items-center text-xs font-bold text-primary-600 bg-primary-50 w-fit px-2 py-1 rounded-xl">
                 <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" /></svg>
                 <?php echo $todayRegisteredUsers; ?> today
             </div>
@@ -70,7 +72,7 @@ include 'admin-header.php';
             </div>
             <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Total Orders</p>
             <p class="text-3xl font-black text-slate-900"><?php echo number_format($totalOrders); ?></p>
-            <div class="mt-4 flex items-center text-xs font-bold text-slate-400 bg-slate-50 w-fit px-2 py-1 rounded-lg">
+            <div class="mt-4 flex items-center text-xs font-bold text-slate-400 bg-slate-50 w-fit px-2 py-1 rounded-xl">
                 Global lifetime
             </div>
         </div>
@@ -81,7 +83,7 @@ include 'admin-header.php';
             </div>
             <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Total Revenue</p>
             <p class="text-3xl font-black text-primary-600"><?php echo formatCurrency($totalRevenue); ?></p>
-            <div class="mt-4 flex items-center text-xs font-bold text-slate-400 bg-slate-50 w-fit px-2 py-1 rounded-lg">
+            <div class="mt-4 flex items-center text-xs font-bold text-slate-400 bg-slate-50 w-fit px-2 py-1 rounded-xl">
                 Completed orders
             </div>
         </div>
@@ -92,7 +94,7 @@ include 'admin-header.php';
             </div>
             <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Funds Added</p>
             <p class="text-3xl font-black text-slate-900"><?php echo formatCurrency($totalFundsAdded); ?></p>
-            <div class="mt-4 flex items-center text-xs font-bold text-amber-600 bg-amber-50 w-fit px-2 py-1 rounded-lg">
+            <div class="mt-4 flex items-center text-xs font-bold text-amber-600 bg-amber-50 w-fit px-2 py-1 rounded-xl">
                 <?php echo $pendingFunds; ?> pending
             </div>
         </div>

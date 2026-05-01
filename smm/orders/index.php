@@ -84,7 +84,7 @@ include '../include/user-layout-start.php';
                 $isActive = $statusFilter === $key;
             ?>
             <a href="?<?php echo $key ? "status=$key" : ''; ?>" 
-               class="px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 flex-shrink-0 <?php echo $isActive ? 'bg-primary-600 text-white shadow-md shadow-emerald-200' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:bg-slate-50'; ?>">
+               class="px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 flex-shrink-0 <?php echo $isActive ? 'bg-primary-600 text-white shadow-md shadow-primary-200' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:bg-slate-50'; ?>">
                 <?php echo $label; ?>
             </a>
             <?php endforeach; ?>
@@ -152,7 +152,7 @@ include '../include/user-layout-start.php';
                         </div>
                         
                         <!-- Action -->
-                        <a href="../order-details/?id=<?php echo $order['id']; ?>" class="w-full inline-flex items-center justify-center px-4 py-2 bg-slate-100 text-slate-600 text-xs font-bold rounded-lg hover:bg-primary-600 hover:text-white transition-all duration-200">
+                        <a href="../order-details/?id=<?php echo $order['id']; ?>" class="w-full inline-flex items-center justify-center px-4 py-2 bg-slate-100 text-slate-600 text-xs font-bold rounded-xl hover:bg-primary-600 hover:text-white transition-all duration-200">
                             View Details
                         </a>
                     </div>
@@ -165,7 +165,7 @@ include '../include/user-layout-start.php';
                     <h3 class="text-sm font-medium text-gray-900">No orders found</h3>
                     <p class="text-xs text-gray-500 mt-1">Get started by creating a new order.</p>
                     <div class="mt-4">
-                        <a href="../order/" class="inline-flex items-center px-3 py-2 text-xs font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors">
+                        <a href="../order/" class="inline-flex items-center px-3 py-2 text-xs font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-xl transition-colors">
                             Create New Order
                         </a>
                     </div>
@@ -230,7 +230,7 @@ include '../include/user-layout-start.php';
                                     <?php echo date('M d, Y', strtotime($order['created_at'])); ?>
                                 </td>
                                 <td class="px-4 lg:px-6 py-4 whitespace-nowrap text-right text-xs font-bold">
-                                    <a href="../order-details/?id=<?php echo $order['id']; ?>" class="inline-flex items-center px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg hover:bg-primary-600 hover:text-white transition-all duration-200 font-bold">
+                                    <a href="../order-details/?id=<?php echo $order['id']; ?>" class="inline-flex items-center px-3 py-1.5 bg-slate-100 text-slate-600 rounded-xl hover:bg-primary-600 hover:text-white transition-all duration-200 font-bold">
                                         View
                                     </a>
                                 </td>
@@ -245,7 +245,7 @@ include '../include/user-layout-start.php';
                                 <h3 class="text-sm font-medium text-gray-900">No orders found</h3>
                                 <p class="text-xs text-gray-500 mt-1">Get started by creating a new order.</p>
                                 <div class="mt-4">
-                                    <a href="../order/" class="inline-flex items-center px-4 py-2 text-xs font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors">
+                                    <a href="../order/" class="inline-flex items-center px-4 py-2 text-xs font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-xl transition-colors">
                                         Create New Order
                                     </a>
                                 </div>
@@ -266,21 +266,21 @@ include '../include/user-layout-start.php';
                 <nav class="flex gap-1 sm:gap-2" aria-label="Pagination">
                     <!-- Previous -->
                     <?php if ($page > 1): ?>
-                    <a href="?page=<?php echo $page - 1; ?><?php echo $statusFilter ? "&status=$statusFilter" : ''; ?>" class="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg border border-slate-300 bg-white text-slate-600 text-xs sm:text-sm font-bold hover:bg-slate-50 transition-colors">
+                    <a href="?page=<?php echo $page - 1; ?><?php echo $statusFilter ? "&status=$statusFilter" : ''; ?>" class="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl border border-slate-300 bg-white text-slate-600 text-xs sm:text-sm font-bold hover:bg-slate-50 transition-colors">
                         Prev
                     </a>
                     <?php endif; ?>
 
                     <!-- Numbers -->
                     <?php for ($i = max(1, $page - 2); $i <= min($totalPages, $page + 2); $i++): ?>
-                    <a href="?page=<?php echo $i; ?><?php echo $statusFilter ? "&status=$statusFilter" : ''; ?>" class="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-bold transition-colors <?php echo $i === $page ? 'bg-primary-600 text-white border border-primary-600' : 'bg-white text-slate-600 border border-slate-300 hover:bg-slate-50'; ?>">
+                    <a href="?page=<?php echo $i; ?><?php echo $statusFilter ? "&status=$statusFilter" : ''; ?>" class="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold transition-colors <?php echo $i === $page ? 'bg-primary-600 text-white border border-primary-600' : 'bg-white text-slate-600 border border-slate-300 hover:bg-slate-50'; ?>">
                         <?php echo $i; ?>
                     </a>
                     <?php endfor; ?>
 
                     <!-- Next -->
                     <?php if ($page < $totalPages): ?>
-                    <a href="?page=<?php echo $page + 1; ?><?php echo $statusFilter ? "&status=$statusFilter" : ''; ?>" class="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg border border-slate-300 bg-white text-slate-600 text-xs sm:text-sm font-bold hover:bg-slate-50 transition-colors">
+                    <a href="?page=<?php echo $page + 1; ?><?php echo $statusFilter ? "&status=$statusFilter" : ''; ?>" class="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl border border-slate-300 bg-white text-slate-600 text-xs sm:text-sm font-bold hover:bg-slate-50 transition-colors">
                         Next
                     </a>
                     <?php endif; ?>

@@ -223,7 +223,7 @@ include 'admin-header.php';
     <!-- Period Selector -->
     <div class="flex flex-wrap gap-2">
         <?php foreach ($validPeriods as $p): ?>
-            <a href="?period=<?php echo $p; ?>" class="px-4 py-2 rounded-lg font-semibold text-sm transition-all <?php echo $period === $p ? 'bg-primary-600 text-white' : 'bg-white border border-slate-200 text-slate-700 hover:border-primary-300'; ?>">
+            <a href="?period=<?php echo $p; ?>" class="px-4 py-2 rounded-xl font-semibold text-sm transition-all <?php echo $period === $p ? 'bg-primary-600 text-white' : 'bg-white border border-slate-200 text-slate-700 hover:border-primary-300'; ?>">
                 <?php echo ucfirst($p); ?>
             </a>
         <?php endforeach; ?>
@@ -235,7 +235,7 @@ include 'admin-header.php';
         <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
             <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Completed Deposits</p>
             <p class="text-3xl font-black text-primary-600"><?php echo formatCurrency($totalDeposits['total'] ?? 0); ?></p>
-            <div class="mt-4 flex items-center text-xs font-bold text-primary-600 bg-primary-50 w-fit px-2 py-1 rounded-lg">
+            <div class="mt-4 flex items-center text-xs font-bold text-primary-600 bg-primary-50 w-fit px-2 py-1 rounded-xl">
                 <?php echo $completedCount; ?> transactions
             </div>
         </div>
@@ -244,7 +244,7 @@ include 'admin-header.php';
         <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
             <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Pending Deposits</p>
             <p class="text-3xl font-black text-amber-600"><?php echo formatCurrency($pendingDeposits['total'] ?? 0); ?></p>
-            <div class="mt-4 flex items-center text-xs font-bold text-amber-600 bg-amber-50 w-fit px-2 py-1 rounded-lg">
+            <div class="mt-4 flex items-center text-xs font-bold text-amber-600 bg-amber-50 w-fit px-2 py-1 rounded-xl">
                 <?php echo $pendingCount; ?> transactions
             </div>
         </div>
@@ -262,7 +262,7 @@ include 'admin-header.php';
         <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
             <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Failed Deposits</p>
             <p class="text-3xl font-black text-red-600"><?php echo formatCurrency($failedDeposits['total'] ?? 0); ?></p>
-            <div class="mt-4 flex items-center text-xs font-bold text-red-600 bg-red-50 w-fit px-2 py-1 rounded-lg">
+            <div class="mt-4 flex items-center text-xs font-bold text-red-600 bg-red-50 w-fit px-2 py-1 rounded-xl">
                 <?php echo $failedCount; ?> transactions
             </div>
         </div>
