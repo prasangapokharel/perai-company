@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="text-center mb-10">
                     <a href="../" class="inline-flex items-center gap-2 mb-8">
                         <img src="../assets/logo.png" alt="OkxSmm Logo" class="h-10 w-auto">
-                        <span class="text-2xl font-bold text-gray-900 tracking-tight">SMM<span class="text-primary-600">Panel</span></span>
+                        <span class="text-2xl font-bold text-gray-900 tracking-tight">OkxSmm</span>
                     </a>
                     <h1 class="text-3xl font-bold text-gray-900 mb-3">Create an Account</h1>
                     <p class="text-gray-500">Buy TikTok, FB, Insta, YouTube followers & more.</p>
