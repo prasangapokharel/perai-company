@@ -118,7 +118,9 @@ try {
         exit;
     }
     
-    $services = $validServices;
+     $services = $validServices;
+    
+    error_log("===== ABOUT TO START SCHEMA CHECKS =====");
     
     $imported = 0;
     $updated = 0;
