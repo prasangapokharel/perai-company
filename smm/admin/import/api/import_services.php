@@ -201,9 +201,26 @@ try {
                 } else {
                     if ($conn->query("INSERT INTO service_categories (name) VALUES ('$categoryName')")) {
                         $categoryId = (int) $conn->insert_id;
+                        error_log("    Created category: '$categoryName' with id=$categoryId");
                     }
                 }
             }
+            
+            // If still no category ID, create a default one
+            if (!$categoryId && $hasCategoryIdColumn) {
+                error_log("    WARNING: No category_id found, creating default category");
+                if ($conn->query("INSERT INTO service_categories (name) VALUES ('Uncategorized')")) {
+                    $categoryId = (int) $conn->insert_id;
+                } else {
+                    // Try to use existing Uncategorized
+                    $uncatResult = $conn->query("SELECT id FROM service_categories WHERE name = 'Uncategorized' LIMIT 1");
+                    if ($uncatResult && $uncatResult->num_rows > 0) {
+                        $categoryId = (int) $uncatResult->fetch_assoc()['id'];
+                    }
+                }
+            }
+            
+            error_log("    Final category_id=$categoryId for '$categoryName'");
             
             // Calculate price with markup
             $price = floatval($service['rate'] ?? 0) * (1 + $markup / 100);
@@ -246,7 +263,8 @@ try {
                     $updates[] = "category = '$categoryName'";
                 }
                 if ($hasCategoryIdColumn) {
-                    $updates[] = "category_id = " . ($categoryId ? $categoryId : "NULL");
+                    // category_id is NOT NULL, so always use a valid ID
+                    $updates[] = "category_id = " . ((int)$categoryId ? (int)$categoryId : 1);
                 }
                 $updates[] = "price = $price";
                 $updates[] = "min_quantity = $minQty";
@@ -301,7 +319,8 @@ try {
 
                 if ($hasCategoryIdColumn) {
                     $columns[] = 'category_id';
-                    $values[] = $categoryId ? $categoryId : "NULL";
+                    // category_id is NOT NULL, so always use a valid ID
+                    $values[] = (int)$categoryId ? (int)$categoryId : 1;  // Default to ID 1 or the ID we just created
                 }
 
                 if ($hasStatusColumn) {
