@@ -229,10 +229,15 @@ try {
             $maxQty = isset($service['max']) ? intval($service['max']) : 0;
             $apiServiceId = isset($service['service']) ? intval($service['service']) : 0;
             
+            error_log("  Final Values: apiServiceId=$apiServiceId, price=$price, minQty=$minQty, maxQty=$maxQty, categoryId=$categoryId");
+            
             if ($apiServiceId <= 0) {
+                error_log("  SKIPPED: Invalid apiServiceId ($apiServiceId)");
                 $errors++;
                 continue;
             }
+            
+            error_log("  Checking if service exists in DB...");
             
             // Check if service exists
             $existingService = $conn->query(
