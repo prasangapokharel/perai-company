@@ -139,9 +139,12 @@ try {
 </header>
 
 <!-- Hero Section -->
-<main id="home" class="relative pt-32 pb-20 px-6 overflow-hidden min-h-screen flex items-center" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(37, 99, 235, 0.05) 100%), url('/assets/images/hero-section.jpg'); background-size: cover; background-position: center; background-attachment: fixed;">
+<main id="home" class="relative pt-32 pb-20 px-6 overflow-hidden min-h-screen flex items-center">
+    <!-- Background Image with Blur and Opacity -->
+    <div class="absolute inset-0 -z-20" style="background-image: url('/assets/images/hero-bg-blur.jpg'); background-size: cover; background-position: center; background-attachment: fixed; filter: blur(8px); opacity: 0.6;"></div>
+    
     <!-- Dark Overlay for text readability -->
-    <div class="absolute inset-0 bg-black/30 -z-10"></div>
+    <div class="absolute inset-0 bg-black/40 -z-10"></div>
     
     <!-- Background Decorations -->
     <div class="absolute top-1/4 right-0 w-[600px] h-[600px] radial-glow -z-10"></div>
