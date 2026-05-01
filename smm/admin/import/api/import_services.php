@@ -257,12 +257,15 @@ try {
                 }
 
                 $sql = "UPDATE services SET " . implode(', ', $updates) . " WHERE id = {$existingService['id']}";
+                error_log("  UPDATE SQL: " . substr($sql, 0, 200) . "...");
                 
                 if ($conn->query($sql)) {
                     $updated++;
+                    error_log("  ✓ UPDATED");
                 } else {
                     $errors++;
                     $errorDetails[] = "Update failed for service {$apiServiceId}: " . $conn->error;
+                    error_log("  ✗ UPDATE ERROR: " . $conn->error);
                 }
             } else {
                 // Insert new service
@@ -307,12 +310,15 @@ try {
                 }
 
                 $sql = "INSERT INTO services (" . implode(', ', $columns) . ") VALUES (" . implode(', ', $values) . ")";
+                error_log("  INSERT SQL: " . substr($sql, 0, 200) . "...");
                 
                 if ($conn->query($sql)) {
                     $imported++;
+                    error_log("  ✓ INSERTED");
                 } else {
                     $errors++;
                     $errorDetails[] = "Insert failed for service {$apiServiceId}: " . $conn->error;
+                    error_log("  ✗ INSERT ERROR: " . $conn->error);
                 }
             }
         } catch (Exception $e) {
