@@ -170,15 +170,21 @@ try {
             }
             
             // Access properties as array keys
-            $serviceName = normalizeServiceText($service['name'] ?? '');
-            $categoryName = normalizeServiceText($service['category'] ?? '');
-            $description = normalizeServiceText($service['description'] ?? '');
+            $rawName = $service['name'] ?? '';
+            $rawCategory = $service['category'] ?? '';
+            $rawDescription = $service['description'] ?? '';
+            
+            $serviceName = normalizeServiceText($rawName);
+            $categoryName = normalizeServiceText($rawCategory);
+            $description = normalizeServiceText($rawDescription);
             $apiServiceId = isset($service['service']) ? intval($service['service']) : 0;
             
-            error_log("Processing service: id=$apiServiceId, name=$serviceName, category=$categoryName");
+            error_log("Processing service: id=$apiServiceId");
+            error_log("  Raw: name='$rawName', category='$rawCategory'");
+            error_log("  Normalized: name='$serviceName' (len=" . strlen($serviceName) . "), category='$categoryName' (len=" . strlen($categoryName) . ")");
             
             if ($serviceName === '' || $categoryName === '') {
-                error_log("  SKIPPED: Empty name or category (name='$serviceName', category='$categoryName')");
+                error_log("  SKIPPED: Empty name or category");
                 $errors++;
                 continue;
             }
