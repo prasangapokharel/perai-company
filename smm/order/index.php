@@ -245,15 +245,16 @@ include '../include/user-layout-start.php';
          background: #3b82f6;
          color: white;
          border-radius: 12px;
-         padding: 0.875rem 1.5rem;
+         padding: 0.5rem 1rem;
          font-weight: 600;
+         font-size: 0.875rem;
          transition: all 0.2s;
      }
      
      .btn-primary:hover {
          background: #2563eb;
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
     
     .service-icon {
@@ -577,11 +578,11 @@ include '../include/user-layout-start.php';
                     </div>
                     
                     <!-- Submit Button -->
-                    <button type="submit" id="submit-button" class="btn-primary w-full flex items-center justify-center shadow-lg shadow-primary-100 text-sm md:text-base py-2.5 md:py-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
-                        </svg>
-                        Submit Order
+                     <button type="submit" id="submit-button" class="btn-primary w-full inline-flex items-center justify-center shadow-lg shadow-primary-100 gap-2">
+                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary-100" viewBox="0 0 20 20" fill="currentColor">
+                             <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+                         </svg>
+                         Submit Order
                     </button>
                 </form>
             </div>

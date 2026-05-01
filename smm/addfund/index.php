@@ -73,8 +73,9 @@ include '../include/user-layout-start.php';
          background: #3b82f6;
          color: white;
          border-radius: 12px;
-         padding: 0.75rem 1.5rem;
+         padding: 0.5rem 1rem;
          font-weight: 600;
+         font-size: 0.875rem;
          transition: all 0.2s;
      }
      
