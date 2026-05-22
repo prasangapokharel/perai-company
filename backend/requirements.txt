@@ -1,0 +1,10 @@
+# Backend dependencies
+supabase
+fastapi
+uvicorn[standard]
+sqlalchemy>=2.0
+groq
+alembic
+python-dotenv
+psycopg2-binary
+pydantic>=2.0
