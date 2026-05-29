@@ -55,6 +55,19 @@ class APIKeyUpdate(BaseModel):
     status: APIKeyStatus | None = Field(default=None)
 
 
+class CompanyLogin(BaseModel):
+    """Company login credentials."""
+    email: str = Field(..., min_length=3, max_length=255, description="Company email")
+    password: str = Field(..., min_length=8, max_length=255, description="Company password")
+
+
+class CompanyLoginResponse(BaseModel):
+    """Company login response."""
+    message: str
+    company: "CompanyRead"
+    api_key_instruction: str
+
+
 class CompanyCreate(BaseModel):
     company_name: str = Field(..., min_length=1, max_length=255)
     company_email: str = Field(..., min_length=3, max_length=255)

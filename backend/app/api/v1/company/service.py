@@ -12,6 +12,7 @@ from app.core.finetune.rag.main import (
     delete_training_file_for_company,
     save_training_file_for_company,
 )
+from app.core.file_storage import delete_company_storage
 from app.models.company import Company, CompanyFinetune
 from app.schemas.companySchema import CompanyCreate, CompanyFinetuneUpload, CompanyUpdate
 
@@ -87,6 +88,7 @@ def update_company(db: Session, company_id: int, payload: CompanyUpdate) -> Comp
 def delete_company(db: Session, company_id: int) -> None:
     get_company(db, company_id)
     delete_training_file_for_company(company_id)
+    delete_company_storage(company_id)  # Delete all company files
     db.query(CompanyFinetune).filter(CompanyFinetune.company_id == company_id).delete()
     db.query(Company).filter(Company.id == company_id).delete()
     db.commit()

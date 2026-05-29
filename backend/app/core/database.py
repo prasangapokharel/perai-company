@@ -15,12 +15,17 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, futu
 Base = declarative_base()
 
 
-def getDb() -> Generator[Session, None, None]:
+def get_db() -> Generator[Session, None, None]:
+    """Get database session."""
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+
+
+# Alias for backward compatibility
+getDb = get_db
 
 
 def init_db() -> None:
