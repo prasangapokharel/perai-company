@@ -1,0 +1,50 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+
+  "skills": {
+    "paths": [
+      ".agents/next-skills/skills/next-best-practices"
+    ]
+  },
+
+  "instructions": [
+    "AGENTS.md",
+    ".agents/code-quality/SKILLS.md",
+    ".agents/api-backend/api/README.md",
+    ".agents/api-backend/api/FRONTEND_INTEGRATION.md",
+    ".agents/api-backend/api/AUTHENTICATION.md",
+    ".agents/api-backend/api/COMPANY.md",
+    ".agents/api-backend/api/FINETUNE.md",
+    ".agents/api-backend/api/API_KEYS.md",
+    ".agents/api-backend/api/ERROR_CODES.md",
+    ".agents/api-backend/api/EXAMPLES.md",
+    "../backend/app/api/v1/**/*.py"
+  ],
+
+  "mode": {
+    "build": {
+      "temperature": 0.2,
+      "steps": 12,
+      "description": "Use for implementation work. Read AGENTS.md, frontend instructions, and backend/app/api/v1 before making changes. Prefer existing UI components, clean imports, and minimal edits.",
+      "prompt": "Act as a senior full-stack engineer. Read the relevant frontend and backend API files before changing code. Always inspect backend/app/api/v1 and the existing UI components in components/ui. Use minimal, scalable changes. Prefer existing components, absolute imports, and app router conventions."
+    },
+    "plan": {
+      "temperature": 0.1,
+      "steps": 8,
+      "description": "Use for repository mapping and solution design. Review frontend and backend API context first.",
+      "prompt": "Act as a senior software architect. First map the repository using available tools, including backend/app/api/v1, then design a scalable approach. Focus on structure, data flow, and separation of concerns. Do not generate full code unless explicitly required."
+    },
+    "review": {
+      "temperature": 0,
+      "steps": 6,
+      "description": "Use for code review and risk detection.",
+      "prompt": "Act as a strict reviewer. Inspect frontend and backend integration paths, identify bugs, security issues, performance bottlenecks, and architectural flaws. Provide exact fixes with minimal explanation."
+    }
+  },
+
+  "permission": {
+    "edit": "allow",
+    "bash": "allow",
+    "webfetch": "allow"
+  }
+}
