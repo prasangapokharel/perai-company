@@ -10,6 +10,7 @@ from app.api.v1.chat.route import router as chat_router
 from app.api.v1.company.route import router as company_router
 from app.api.v1.apikey.route import router as apikey_router
 from app.api.v1.ticket.route import router as ticket_router
+from app.api.v1.companySettings.route import router as company_settings_router
 from app.core.database import init_db
 
 
@@ -40,6 +41,7 @@ app.include_router(company_router)
 app.include_router(chat_router)
 app.include_router(apikey_router)
 app.include_router(ticket_router)
+app.include_router(company_settings_router)
 
 
 @app.get("/")

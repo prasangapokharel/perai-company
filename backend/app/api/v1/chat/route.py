@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
-from app.api.v1.chat.service import get_company_prompt
+from app.api.v1.chat.service import get_company_prompt, get_company_prompt_with_settings
 from app.api.v1.company.service import get_company_model_name
 from app.core.database import getDb
 from app.schemas.companySchema import ChatQuery, ChatResponse
@@ -58,16 +58,17 @@ def ping(company_id: int):
 
 @router.post("/{company_id}/chat/query", response_model=ChatResponse)
 def query_company_chat(company_id: int, payload: ChatQuery, db: Session = Depends(getDb)):
-    """Query company with finetune model.
+    """Query company with finetune model and dynamic settings.
     
-    Returns response from the company's AI model based on finetune data.
+    Returns response from the company's AI model based on finetune data,
+    tone, and language preferences.
     """
     try:
         # Get company and model name
         model_name = get_company_model_name(db, company_id)
         
-        # Get system prompt with finetune data
-        _, system_prompt = get_company_prompt(db, company_id)
+        # Get system prompt with settings (tone, language, max_tokens)
+        _, system_prompt, settings = get_company_prompt_with_settings(db, company_id)
         
         # Prepare messages
         messages = [
@@ -75,8 +76,8 @@ def query_company_chat(company_id: int, payload: ChatQuery, db: Session = Depend
             {"role": "user", "content": payload.prompt},
         ]
         
-        # Get response from Groq
-        stream = stream_chat_completion(messages)
+        # Get response from Groq with max_tokens from settings
+        stream = stream_chat_completion(messages, max_tokens=settings.max_tokens)
         response_text = ""
         for chunk in stream:
             content = getattr(chunk.choices[0].delta, "content", None)
