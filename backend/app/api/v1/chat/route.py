@@ -7,12 +7,30 @@ import json
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
 
 from app.api.v1.chat.service import get_company_prompt, get_company_prompt_with_settings
 from app.api.v1.company.service import get_company_model_name
 from app.core.database import getDb
+from app.core.promptTemplateGenerator import prompt_template_generator
 from app.schemas.companySchema import ChatQuery, ChatResponse
 from app.services.groq.groq import stream_chat_completion
+
+
+class PromptPreviewRequest(BaseModel):
+    """Request model for prompt preview."""
+    tone: str
+    language: str
+    max_tokens: int
+    company_name: str
+    category: str
+    website: str
+
+
+class PromptPreviewResponse(BaseModel):
+    """Response model for prompt preview."""
+    prompt: str
+    metadata: dict
 
 
 router = APIRouter(prefix="/api/v1/company", tags=["chat"])
@@ -54,6 +72,37 @@ async def stream_company_chat(company_id: int, request: Request, db: Session = D
 @router.get("/{company_id}/chat/ping")
 def ping(company_id: int):
     return {"company_id": company_id, "status": "ok"}
+
+
+@router.post("/{company_id}/prompt/preview", response_model=PromptPreviewResponse)
+def preview_prompt(company_id: int, payload: PromptPreviewRequest, db: Session = Depends(getDb)):
+    """Generate a preview of the system prompt with given settings.
+    
+    This endpoint allows users to see how their settings affect the system prompt
+    before saving them.
+    """
+    try:
+        # Generate prompt preview using template generator
+        preview_data = prompt_template_generator.preview_prompt(
+            company_name=payload.company_name,
+            category=payload.category,
+            website=payload.website,
+            tone=payload.tone,
+            language=payload.language,
+            max_tokens=payload.max_tokens,
+            knowledge_block="",  # Will be fetched from database if needed
+            fallback_contact="Contact support"
+        )
+        
+        return PromptPreviewResponse(
+            prompt=preview_data["prompt"],
+            metadata=preview_data["metadata"]
+        )
+    except Exception as err:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to generate preview: {str(err)}"
+        ) from err
 
 
 @router.post("/{company_id}/chat/query", response_model=ChatResponse)

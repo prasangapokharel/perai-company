@@ -1,11 +1,20 @@
 """System Prompt Generator with Dynamic Tone and Language"""
 from app.models.companySettings import CompanySettings
+from app.core.promptTemplateGenerator import (
+    PromptTemplateGenerator, 
+    ToneEnum, 
+    LanguageEnum
+)
 
 
 class PromptGenerator:
     """Generate dynamic system prompts based on company settings"""
     
-    # Tone-specific instructions
+    def __init__(self):
+        """Initialize with template generator."""
+        self.template_generator = PromptTemplateGenerator()
+    
+    # Tone-specific instructions (legacy, kept for backward compatibility)
     TONE_INSTRUCTIONS = {
         "formal": """You are a professional AI assistant. Respond in a formal, structured manner. 
 Use proper grammar, professional vocabulary, and maintain a business-appropriate tone. 
@@ -21,7 +30,7 @@ Use a personable tone while maintaining professionalism. Show genuine interest i
 Use industry-appropriate terminology. Provide comprehensive, well-reasoned responses."""
     }
     
-    # Language-specific prefixes
+    # Language-specific prefixes (legacy, kept for backward compatibility)
     LANGUAGE_INSTRUCTIONS = {
         "english": """You are responding in English. Provide clear, grammatically correct responses.""",
         
@@ -32,50 +41,40 @@ Use industry-appropriate terminology. Provide comprehensive, well-reasoned respo
     @staticmethod
     def generateSystemPrompt(
         company_settings: CompanySettings,
-        base_context: str = ""
+        base_context: str = "",
+        company_name: str = "Company",
+        category: str = "Service Provider",
+        website: str = "https://example.com"
     ) -> str:
-        """Generate a complete system prompt with settings
+        """Generate a complete system prompt with settings using template system
         
         Args:
             company_settings: CompanySettings object with language and tone
             base_context: Company's knowledge base content
+            company_name: Company name
+            category: Company category
+            website: Company website
         
         Returns:
             Complete system prompt string
         """
+        generator = PromptTemplateGenerator()
         
-        # Get tone and language instructions
-        tone = company_settings.tone.lower()
-        language = company_settings.language.lower()
+        # Map string values to enums
+        tone = ToneEnum(company_settings.tone.lower())
+        language = LanguageEnum(company_settings.language.lower())
         
-        tone_instruction = PromptGenerator.TONE_INSTRUCTIONS.get(
-            tone,
-            PromptGenerator.TONE_INSTRUCTIONS["formal"]
+        # Generate using template system
+        system_prompt = generator.generate_system_prompt(
+            company_name=company_name,
+            category=category,
+            website=website,
+            tone=tone,
+            language=language,
+            max_tokens=company_settings.max_tokens,
+            knowledge_block=base_context if base_context else "",
+            fallback_contact="Contact support"
         )
-        
-        language_instruction = PromptGenerator.LANGUAGE_INSTRUCTIONS.get(
-            language,
-            PromptGenerator.LANGUAGE_INSTRUCTIONS["english"]
-        )
-        
-        # Build complete prompt
-        system_prompt = f"""SYSTEM PROMPT FOR AI ASSISTANT
-{'='*50}
-
-TONE & BEHAVIOR:
-{tone_instruction}
-
-LANGUAGE PREFERENCE:
-{language_instruction}
-
-TOKEN LIMIT: {company_settings.max_tokens} tokens
-
-COMPANY KNOWLEDGE BASE:
-{base_context if base_context else "No specific company knowledge provided yet."}
-
-{'='*50}
-
-Please respond according to the above instructions."""
         
         return system_prompt
     
