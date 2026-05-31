@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 
 from app.core.finetune.rag.main import (
     delete_training_file_for_company,
+    load_training_file_for_company,
     save_training_file_for_company,
 )
 from app.core.file_storage import delete_company_storage
@@ -123,6 +124,7 @@ def upsert_company_finetune(
 
     db.commit()
     db.refresh(finetune)
+    finetune.content = load_training_file_for_company(company.id)
     return finetune
 
 
@@ -134,6 +136,7 @@ def get_company_finetune(db: Session, company_id: int) -> CompanyFinetune:
     )
     if not finetune:
         raise ValueError("Company finetune not found")
+    finetune.content = load_training_file_for_company(company_id)
     return finetune
 
 

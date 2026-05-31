@@ -9,6 +9,14 @@ export type CompanyFile = {
   uploaded_at?: string
 }
 
+export type CompanyStorageList = {
+  company_id: number
+  files: {
+    logo: { path: string; size: number } | null
+    content_files: Array<{ name: string; path: string; size: number }>
+  }
+}
+
 export function uploadCompanyLogo(companyId: number, file: File, apiKey?: string) {
   const formData = new FormData()
   formData.append("file", file)
@@ -40,9 +48,13 @@ export function getCompanyLogoUrl(companyId: number) {
 }
 
 export function listCompanyFiles(companyId: number, apiKey?: string) {
-  return apiClient<{ company_id: number; files: CompanyFile[] }>(
+  return apiClient<CompanyStorageList>(
     `/files/companies/${companyId}/list`,
     {},
     apiKey
   )
+}
+
+export function downloadCompanyLogoUrl(companyId: number) {
+  return `${process.env.API_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000/api/v1"}/files/companies/${companyId}/logo`
 }

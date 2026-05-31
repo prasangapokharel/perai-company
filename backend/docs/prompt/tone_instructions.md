@@ -1,0 +1,5 @@
+- professional: Use formal, precise language. No slang.
+- friendly: Be warm, approachable, and conversational.
+- technical: Use technical terms freely. Assume expertise.
+- simple: Use plain language. Short sentences. No jargon.
+- sales: Be persuasive, benefit-focused, and enthusiastic.

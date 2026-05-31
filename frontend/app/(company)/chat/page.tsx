@@ -97,6 +97,9 @@ export default function ChatPage() {
         <p className="text-muted-foreground">
           Ask questions about your company knowledge base
         </p>
+        <Button variant="outline" size="sm" className="mt-3" onClick={() => router.push("/models") }>
+          View model
+        </Button>
       </div>
 
       {error && (

@@ -23,6 +23,9 @@ export type CompanyFinetune = {
   company_id: number
   company_model_name: string
   rag_company_path: string
+  content?: string | null
+  created_at?: string
+  updated_at?: string
 }
 
 export type CompanyListResponse = Company[]

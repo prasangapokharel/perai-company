@@ -38,6 +38,13 @@ class Company(Base):
         lazy="selectin",
     )
 
+    tickets = relationship(
+        "Ticket",
+        back_populates="company",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )
+
     @property
     def company_model_name(self) -> str | None:
         """Get company model name from finetune data."""

@@ -1,0 +1,3 @@
+- concise: Keep replies under 3 sentences unless detail is critical.
+- balanced: Use normal paragraph length. Expand when helpful.
+- detailed: Provide thorough, complete answers. Use structure.

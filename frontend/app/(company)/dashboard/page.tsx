@@ -123,6 +123,19 @@ export default function DashboardPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Model Name</CardTitle>
+            <Badge variant="secondary">Model</Badge>
+          </CardHeader>
+          <CardContent>
+            <div className="text-sm font-semibold truncate">
+              {company.company_model_name || "Not configured"}
+            </div>
+            <p className="text-xs text-muted-foreground">Current company model</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Email</CardTitle>
             <MessageSquare className="h-4 w-4 text-muted-foreground" />
           </CardHeader>

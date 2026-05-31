@@ -106,6 +106,7 @@ class CompanyFinetuneRead(BaseModel):
     company_id: int
     company_model_name: str
     rag_company_path: str
+    content: str | None = None
     created_at: datetime
     updated_at: datetime
 

@@ -95,10 +95,15 @@ export default function ProfilePage() {
               <Input value={company.website || "Not set"} disabled />
             </Field>
 
-            <Field>
-              <FieldLabel>Model Name</FieldLabel>
-              <Input value={company.company_model_name || "Not configured"} disabled />
-            </Field>
+          <Field>
+            <FieldLabel>Model Name</FieldLabel>
+            <Input value={company.company_model_name || "Not configured"} disabled />
+          </Field>
+
+          <Field>
+            <FieldLabel>Logo</FieldLabel>
+            <Input value={company.logo || "Not set"} disabled />
+          </Field>
 
             <Field>
               <FieldLabel>Created</FieldLabel>

@@ -217,6 +217,9 @@ export default function APIPage() {
           <h1 className="text-3xl font-bold tracking-tight">API Keys</h1>
           <p className="text-muted-foreground">Manage your company API keys</p>
         </div>
+        <Button variant="outline" onClick={() => router.push("/models") }>
+          View Models
+        </Button>
         <Dialog open={createOpen} onOpenChange={setCreateOpen}>
           <DialogTrigger>
             <Button type="button">

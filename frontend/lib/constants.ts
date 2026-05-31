@@ -5,6 +5,7 @@ import {
   Key,
   Ticket,
   User,
+  Bot,
   type LucideIcon,
 } from "lucide-react"
 
@@ -19,6 +20,7 @@ export type NavItem = {
 export const COMPANY_NAV: NavItem[] = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { title: "Chat", href: "/chat", icon: MessageSquare },
+  { title: "Models", href: "/models", icon: Bot },
   { title: "Finetune", href: "/finetune", icon: Zap },
   { title: "API", href: "/api", icon: Key },
   { title: "Tickets", href: "/ticket", icon: Ticket },
