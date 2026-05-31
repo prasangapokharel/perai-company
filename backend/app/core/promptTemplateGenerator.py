@@ -96,7 +96,7 @@ class PromptTemplateGenerator:
     
     def __init__(self):
         """Initialize the prompt template generator."""
-        self.template_path = Path(__file__).parent / "prompts" / "SystemPrompt.md"
+        self.template_path = Path(__file__).parent / "finetune" / "prompts" / "SystemPrompt.md"
         self.template_content = self._load_template()
     
     def _load_template(self) -> str:

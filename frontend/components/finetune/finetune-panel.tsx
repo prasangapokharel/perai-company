@@ -2,8 +2,6 @@
 
 import * as React from "react"
 
-import { Upload, FileText, Trash2 } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
@@ -71,21 +69,18 @@ export function FinetunePanel({ companyId, apiKey }: { companyId?: number; apiKe
           <input
             ref={fileInputRef}
             type="file"
-            accept=".txt,.md,.markdown,.json,.csv"
+            accept=".txt,.md,.markdown"
             className="hidden"
             onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
           />
-          <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-            <Upload className="h-4 w-4" />
-          </div>
           <p className="text-sm font-medium">Drag & drop a knowledge file</p>
           <p className="text-xs text-muted-foreground">or paste/edit content below</p>
           <div className="mt-3 flex flex-wrap justify-center gap-2">
             <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
-              <FileText className="mr-2 h-4 w-4" /> Choose file
+              Choose file
             </Button>
             <Button type="button" variant="ghost" onClick={() => { setContent(""); setStatus("Cleared") }}>
-              <Trash2 className="mr-2 h-4 w-4" /> Clear
+              Clear
             </Button>
           </div>
         </div>
