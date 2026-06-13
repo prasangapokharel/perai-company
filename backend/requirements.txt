@@ -18,6 +18,8 @@ slowapi
 
 # AI
 groq
+supertonic
+soundfile
 
 # Embeddings (lightweight ONNX-based, no PyTorch)
 fastembed

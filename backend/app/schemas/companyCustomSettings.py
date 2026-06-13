@@ -14,7 +14,7 @@ class CompanyCustomSettingsCreate(BaseModel):
         default="formal", description="Tone/style for AI responses"
     )
     max_tokens: int = Field(
-        default=1000, ge=100, le=4000, description="Maximum tokens for API responses (100-4000)"
+        default=350, ge=100, le=4000, description="Maximum tokens for API responses (100-4000)"
     )
 
 

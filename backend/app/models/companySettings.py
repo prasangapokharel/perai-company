@@ -44,7 +44,7 @@ class CompanySettings(Base):
 
     language = Column(String(50), default="english", nullable=False)
     tone = Column(String(50), default="formal", nullable=False)
-    max_tokens = Column(Integer, default=1000, nullable=False)
+    max_tokens = Column(Integer, default=350, nullable=False)
 
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)

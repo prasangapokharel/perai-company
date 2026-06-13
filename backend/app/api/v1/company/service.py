@@ -89,7 +89,8 @@ def upsert_company_finetune(
 ) -> CompanyFinetune:
     company = get_company(db, company_id)
     knowledge = normalize_jsonl_upload(payload.content)
-    if payload.mode == "append":
+    mode = payload.mode.value if hasattr(payload.mode, "value") else str(payload.mode)
+    if mode == "append":
         path = append_training_file_for_company(company.id, knowledge)
     else:
         path = save_training_file_for_company(company.id, knowledge)

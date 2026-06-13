@@ -10,6 +10,8 @@ Usage in routes:
         db: Session = Depends(get_db),
     ): ...
 
+    # Finetune + chat + most company routes use require_company (JWT or X-API-Key)
+
     # Require API-key only (external integrations / chat widget)
     @router.post("/{company_id}/chat/query")
     def chat(

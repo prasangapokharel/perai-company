@@ -105,9 +105,14 @@ class CompanyRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class FinetuneUploadMode(str, Enum):
+    APPEND = "append"
+    REPLACE = "replace"
+
+
 class CompanyFinetuneUpload(BaseModel):
-    content: str = Field(..., min_length=1)
-    mode: str = Field(default="append", pattern="^(append|replace)$")
+    content: str = Field(..., min_length=1, max_length=10_485_760)
+    mode: FinetuneUploadMode = FinetuneUploadMode.APPEND
 
 
 class CompanyFinetuneRead(BaseModel):
@@ -125,6 +130,7 @@ class CompanyFinetuneRead(BaseModel):
 class ChatQuery(BaseModel):
     prompt: str = Field(..., min_length=1, description="User prompt/question")
     session_id: str | None = Field(default=None, max_length=12, description="Optional session id")
+    audio: bool = Field(default=False, description="Return assistant reply as WAV base64")
 
 
 class ChatResponse(BaseModel):
@@ -135,6 +141,8 @@ class ChatResponse(BaseModel):
     session_id: str | None = None
     message_id: int | None = None
     token_consume: int | None = None
+    audio_base64: str | None = None
+    audio_mime: str | None = None
 
 
 Company = CompanyRead

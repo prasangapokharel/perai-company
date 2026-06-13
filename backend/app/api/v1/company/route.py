@@ -1,4 +1,4 @@
-"""Company API routes — all protected by company ownership."""
+"""Company API routes — JWT or X-API-Key (require_company accepts both)."""
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session

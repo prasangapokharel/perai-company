@@ -9,10 +9,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { API_BASE_URL } from "@/lib/api-client"
 import {
+  curlFinetuneGetSnippet,
+  curlFinetuneUploadSnippet,
   curlQuerySnippet,
   jsonlUploadSnippet,
+  pythonFinetuneGetSnippet,
+  pythonFinetuneUploadSnippet,
   pythonQuerySnippet,
   pythonStreamSnippet,
+  typescriptFinetuneGetSnippet,
+  typescriptFinetuneUploadSnippet,
   typescriptQuerySnippet,
   typescriptStreamSnippet,
 } from "@/lib/integration-snippets"
@@ -52,9 +58,9 @@ export function IntegrationPanel({ companyId, apiKey }: Props) {
     <div className="space-y-6">
       <Alert>
         <AlertDescription>
-          All integrations use <code className="text-xs">X-API-Key</code> authentication. Knowledge uploads accept
-          structured <code className="text-xs">.jsonl</code> only. Retrieval is vectorless (BM25 on disk) so usage
-          scales without embedding load on the database.
+          All integrations use <code className="text-xs">X-API-Key</code> authentication. Upload knowledge with
+          POST <code className="text-xs">/company/{"{id}"}/finetune</code> (append or replace), then query chat.
+          Only structured <code className="text-xs">.jsonl</code> is accepted (max 10MB, 5000 lines).
         </AlertDescription>
       </Alert>
 
@@ -85,6 +91,24 @@ export function IntegrationPanel({ companyId, apiKey }: Props) {
               <CodeBlock label="chat/stream" code={typescriptStreamSnippet(ctx)} />
             </CardContent>
           </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Upload knowledge (finetune)</CardTitle>
+              <CardDescription>Append or replace JSONL knowledge via API key</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <CodeBlock label="POST /finetune" code={typescriptFinetuneUploadSnippet(ctx)} />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Get knowledge (finetune)</CardTitle>
+              <CardDescription>Verify uploaded model and content</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <CodeBlock label="GET /finetune" code={typescriptFinetuneGetSnippet(ctx)} />
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="python" className="mt-4 space-y-4">
@@ -106,9 +130,27 @@ export function IntegrationPanel({ companyId, apiKey }: Props) {
               <CodeBlock label="chat/stream" code={pythonStreamSnippet(ctx)} />
             </CardContent>
           </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Upload knowledge (finetune)</CardTitle>
+              <CardDescription>Same auth as chat — use X-API-Key header</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <CodeBlock label="POST /finetune" code={pythonFinetuneUploadSnippet(ctx)} />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Get knowledge (finetune)</CardTitle>
+              <CardDescription>Read back model name and stored content</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <CodeBlock label="GET /finetune" code={pythonFinetuneGetSnippet(ctx)} />
+            </CardContent>
+          </Card>
         </TabsContent>
 
-        <TabsContent value="curl" className="mt-4">
+        <TabsContent value="curl" className="mt-4 space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Quick test</CardTitle>
@@ -118,14 +160,33 @@ export function IntegrationPanel({ companyId, apiKey }: Props) {
               <CodeBlock label="chat/query" code={curlQuerySnippet(ctx)} />
             </CardContent>
           </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Upload knowledge</CardTitle>
+              <CardDescription>POST finetune with append mode</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <CodeBlock label="POST /finetune" code={curlFinetuneUploadSnippet(ctx)} />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Get knowledge</CardTitle>
+              <CardDescription>Confirm finetune is active</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <CodeBlock label="GET /finetune" code={curlFinetuneGetSnippet(ctx)} />
+            </CardContent>
+          </Card>
         </TabsContent>
 
-        <TabsContent value="jsonl" className="mt-4">
+        <TabsContent value="jsonl" className="mt-4 space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Knowledge upload format</CardTitle>
               <CardDescription>
-                Upload via Finetune page or POST /company/{"{id}"}/finetune with JSON body content as raw JSONL
+                Upload via Finetune page or POST /company/{"{id}"}/finetune with X-API-Key and JSON body
+                {" "}{`{"content":"...jsonl...","mode":"append"}`}
               </CardDescription>
             </CardHeader>
             <CardContent>

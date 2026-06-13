@@ -50,3 +50,9 @@ WIDGET_CORS_ENABLED: bool = getenv("WIDGET_CORS_ENABLED", "true").lower() == "tr
 RAG_TOP_K: int = int(getenv("RAG_TOP_K", "3"))
 RAG_MAX_CONTEXT_CHARS: int = int(getenv("RAG_MAX_CONTEXT_CHARS", "1200"))
 RAG_RECORD_MAX_CHARS: int = int(getenv("RAG_RECORD_MAX_CHARS", "360"))
+
+TTS_VOICE: str = getenv("TTS_VOICE", "M4")
+TTS_MAX_CHARS: int = int(getenv("TTS_MAX_CHARS", "1200"))
+
+DEFAULT_MAX_TOKENS: int = int(getenv("DEFAULT_MAX_TOKENS", "350"))
+CHAT_COMPLETION_CAP: int = int(getenv("CHAT_COMPLETION_CAP", "400"))

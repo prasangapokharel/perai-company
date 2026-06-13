@@ -1,10 +1,18 @@
 import json
 
+MAX_JSONL_BYTES = 10 * 1024 * 1024
+MAX_JSONL_LINES = 5000
+
 
 def parse_jsonl_records(raw: str) -> list[dict]:
+    if len(raw.encode("utf-8")) > MAX_JSONL_BYTES:
+        raise ValueError("JSONL content exceeds 10MB limit")
+
     lines = [line.strip() for line in raw.splitlines() if line.strip()]
     if not lines:
         raise ValueError("JSONL file is empty")
+    if len(lines) > MAX_JSONL_LINES:
+        raise ValueError(f"JSONL exceeds {MAX_JSONL_LINES} lines")
 
     records: list[dict] = []
     for index, line in enumerate(lines, start=1):

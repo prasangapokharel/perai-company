@@ -34,42 +34,39 @@ class PromptTemplateGenerator:
     TONE_INSTRUCTIONS = {
         ToneEnum.FORMAL: {
             "tone_description": "Professional, structured, and formal",
-            "tone_description_for_context": "formal and structured",
+            "tone_description_for_context": "formal, structured, and brief",
             "instructions": (
                 "Use formal language and professional terminology. "
-                "Structure responses with clear sections and bullet points. "
-                "Maintain a professional distance while being helpful. "
+                "Keep answers to 1–3 sentences. "
+                "No bullet lists unless the user asks for a list. "
                 "Use complete sentences and formal grammar."
             ),
         },
         ToneEnum.CASUAL: {
             "tone_description": "Conversational, friendly, and everyday",
-            "tone_description_for_context": "conversational and approachable",
+            "tone_description_for_context": "conversational, approachable, and brief",
             "instructions": (
                 "Use everyday language and conversational tone. "
-                "Be friendly and approachable. "
-                "Feel free to use contractions and informal expressions. "
-                "Make the response feel like talking to a knowledgeable colleague."
+                "Be friendly but get to the point in 1–3 sentences. "
+                "Contractions are fine. No long explanations unless asked."
             ),
         },
         ToneEnum.FRIENDLY: {
             "tone_description": "Warm, welcoming, and empathetic",
-            "tone_description_for_context": "warm and empathetic",
+            "tone_description_for_context": "warm, empathetic, and brief",
             "instructions": (
-                "Be warm and welcoming in your responses. "
-                "Show empathy and understanding for the user's needs. "
-                "Use positive language and encouraging tone. "
-                "Make the user feel valued and supported."
+                "Be warm and welcoming but concise. "
+                "Answer in 1–3 sentences. "
+                "Show empathy without extra padding or repetition."
             ),
         },
         ToneEnum.PROFESSIONAL: {
             "tone_description": "Expert, authoritative, and knowledgeable",
-            "tone_description_for_context": "expert and authoritative",
+            "tone_description_for_context": "expert, authoritative, and brief",
             "instructions": (
-                "Position yourself as an expert in the field. "
-                "Use authoritative but accessible language. "
-                "Provide detailed, well-researched responses. "
-                "Cite company-specific knowledge and expertise."
+                "Sound knowledgeable and confident. "
+                "Give the direct answer in 1–3 sentences. "
+                "Use facts from the knowledge base only. No lectures unless asked."
             ),
         },
     }

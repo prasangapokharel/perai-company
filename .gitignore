@@ -2,3 +2,15 @@
 docs
 frontend/.agents
 backend/.agent
+.env
+**/.env
+*.wav
+reply.wav
+backend/test.db
+**/__pycache__/
+**/.venv/
+backend/py/results/
+backend/py/audiobooks/
+backend/py/tts_onnx.egg-info/
+backend/py/uv.lock
+node_modules/

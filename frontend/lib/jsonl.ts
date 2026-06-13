@@ -5,9 +5,16 @@ export type JsonlValidationResult =
   | { ok: false; error: string }
 
 export function validateJsonl(raw: string): JsonlValidationResult {
+  if (new TextEncoder().encode(raw).length > MAX_JSONL_BYTES) {
+    return { ok: false, error: "JSONL file must be under 10MB" }
+  }
+
   const lines = raw.split("\n").map((line) => line.trim()).filter(Boolean)
   if (!lines.length) {
     return { ok: false, error: "JSONL file is empty" }
+  }
+  if (lines.length > MAX_JSONL_LINES) {
+    return { ok: false, error: `JSONL exceeds ${MAX_JSONL_LINES} lines` }
   }
 
   const records: JsonlRecord[] = []
@@ -61,3 +68,6 @@ export const JSONL_FORMAT_HELP = [
   '{"title":"...","content":"..."}',
   '{"text":"..."}',
 ]
+
+export const MAX_JSONL_LINES = 5000
+export const MAX_JSONL_BYTES = 10 * 1024 * 1024

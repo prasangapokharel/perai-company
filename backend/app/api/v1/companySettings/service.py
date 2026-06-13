@@ -1,5 +1,8 @@
 """Company Settings API Service"""
+
 from sqlalchemy.orm import Session
+
+from app.core.config.config import DEFAULT_MAX_TOKENS
 from app.models.companySettings import CompanySettings
 from app.schemas.companyCustomSettings import (
     CompanyCustomSettingsCreate,
@@ -91,7 +94,10 @@ class CompanySettingsService:
         if not settings:
             # Create default settings
             settings = CompanySettings(
-                company_id=company_id, language="english", tone="formal", max_tokens=1000
+                company_id=company_id,
+                language="english",
+                tone="formal",
+                max_tokens=DEFAULT_MAX_TOKENS,
             )
             db.add(settings)
             db.commit()

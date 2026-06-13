@@ -22,6 +22,7 @@ from app.api.v1.balance.service import (
 )
 from app.api.v1.chat.service import (
     complete_chat_usage,
+    effective_max_completion_tokens,
     estimate_max_chat_cost,
     estimateTokens,
     get_company_prompt_with_settings,
@@ -70,7 +71,8 @@ async def stream_company_chat(
                 return
 
             _, system_prompt, settings = get_company_prompt_with_settings(db, company_id, message)
-            max_cost = estimate_max_chat_cost(system_prompt, message, settings.max_tokens)
+            completion_limit = effective_max_completion_tokens(settings.max_tokens)
+            max_cost = estimate_max_chat_cost(system_prompt, message, completion_limit)
             reserved = reserve_balance(db, company_id, max_cost)
 
             messages = [
@@ -78,7 +80,7 @@ async def stream_company_chat(
                 {"role": "user", "content": message},
             ]
 
-            stream = stream_chat_completion(messages, max_completion_tokens=settings.max_tokens)
+            stream = stream_chat_completion(messages, max_completion_tokens=completion_limit)
             yield 'data: {"type": "start"}\n\n'
             response_text = ""
             usage = None
@@ -174,6 +176,21 @@ def query_company_chat(
             session_id=payload.session_id,
             client_ip=client_ip,
         )
+
+        audio_base64 = None
+        audio_mime = None
+        if payload.audio:
+            try:
+                from app.services.supertonic.supertonic import synthesize_wav_base64
+
+                audio_base64 = synthesize_wav_base64(response_text)
+                audio_mime = "audio/wav"
+            except Exception as err:
+                raise HTTPException(
+                    status_code=status.HTTP_502_BAD_GATEWAY,
+                    detail=f"TTS failed: {err}",
+                ) from err
+
         return ChatResponse(
             model_name=model_name,
             company_id=company_id,
@@ -182,6 +199,8 @@ def query_company_chat(
             session_id=session_id,
             message_id=message_id,
             token_consume=token_consume,
+            audio_base64=audio_base64,
+            audio_mime=audio_mime,
         )
     except InsufficientBalanceError as err:
         raise HTTPException(

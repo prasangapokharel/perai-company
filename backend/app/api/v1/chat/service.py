@@ -4,7 +4,7 @@ from decimal import Decimal
 
 from sqlalchemy.orm import Session
 
-from app.core.config.config import VECTOR_RAG_ENABLED
+from app.core.config.config import CHAT_COMPLETION_CAP, VECTOR_RAG_ENABLED
 from app.core.finetune.prompts.builder import build_company_system_prompt
 from app.core.finetune.rag.main import retrieve_context_for_company
 from app.models.companyRequests import CompanyRequest
@@ -27,6 +27,10 @@ from app.utils.token_cost import calculate_usd_cost, estimate_max_usd_cost, esti
 
 def estimateTokens(text: str) -> int:
     return estimate_tokens(text)
+
+
+def effective_max_completion_tokens(settings_max_tokens: int) -> int:
+    return min(settings_max_tokens, CHAT_COMPLETION_CAP)
 
 
 def calculateBalanceDeducted(input_tokens: int, output_tokens: int) -> Decimal:
@@ -172,7 +176,7 @@ def run_chat_query(
     model_name = get_company_model_name(db, company_id)
     _, system_prompt, settings = get_company_prompt_with_settings(db, company_id, prompt)
 
-    max_cost = estimate_max_chat_cost(system_prompt, prompt, settings.max_tokens)
+    max_cost = estimate_max_chat_cost(system_prompt, prompt, effective_max_completion_tokens(settings.max_tokens))
     reserved = Decimal("0")
 
     try:
@@ -186,7 +190,10 @@ def run_chat_query(
     ]
 
     try:
-        stream = stream_chat_completion(messages, max_completion_tokens=settings.max_tokens)
+        stream = stream_chat_completion(
+            messages,
+            max_completion_tokens=effective_max_completion_tokens(settings.max_tokens),
+        )
         response_text = ""
         usage = None
         for chunk in stream:
