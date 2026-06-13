@@ -3,7 +3,8 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 
-import { isAuthenticatedSession, loadAuthSession } from "@/features/auth/hooks"
+import { loadAuthSession } from "@/features/auth/hooks"
+import { hasAuthCookie, setAuthCookie } from "@/lib/auth-cookie"
 
 export function RequireAuth({ children }: { children: React.ReactNode }) {
   const router = useRouter()
@@ -11,9 +12,13 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
 
   React.useEffect(() => {
     const session = loadAuthSession()
-    if (!isAuthenticatedSession(session)) {
+    const hasSession = !!(session?.accessToken || session?.apiKey)
+    if (!hasSession) {
       router.replace("/login")
       return
+    }
+    if (!hasAuthCookie()) {
+      setAuthCookie()
     }
     setAllowed(true)
   }, [router])

@@ -3,7 +3,8 @@
 import * as React from "react"
 import { Copy, Check, Eye, EyeOff } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
+import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -17,14 +18,31 @@ type Props = {
   companyId: number
   apiKey: string
   companyName?: string
+  error?: string
+  creatingKey?: boolean
+  onSaveApiKey: (apiKey: string) => void
+  onCreateEmbedKey: () => void
 }
 
-export function WidgetEmbedPanel({ companyId, apiKey, companyName }: Props) {
+export function WidgetEmbedPanel({
+  companyId,
+  apiKey,
+  companyName,
+  error,
+  creatingKey = false,
+  onSaveApiKey,
+  onCreateEmbedKey,
+}: Props) {
   const [title, setTitle] = React.useState(companyName ? `Chat with ${companyName}` : "Chat with us")
   const [color, setColor] = React.useState("#2563eb")
   const [showKey, setShowKey] = React.useState(false)
   const [copied, setCopied] = React.useState(false)
   const [origin, setOrigin] = React.useState("http://localhost:3000")
+  const [draftKey, setDraftKey] = React.useState(apiKey)
+
+  React.useEffect(() => {
+    setDraftKey(apiKey)
+  }, [apiKey])
 
   React.useEffect(() => {
     if (typeof window !== "undefined") {
@@ -32,11 +50,12 @@ export function WidgetEmbedPanel({ companyId, apiKey, companyName }: Props) {
     }
   }, [])
 
+  const resolvedKey = apiKey.trim()
   const embedCode = buildEmbedScript({
     widgetOrigin: origin,
     apiBaseUrl: API_BASE_URL,
     companyId,
-    apiKey,
+    apiKey: resolvedKey || "YOUR_API_KEY",
     title,
     color,
   })
@@ -51,6 +70,49 @@ export function WidgetEmbedPanel({ companyId, apiKey, companyName }: Props) {
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
+      {!resolvedKey && (
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>API key required</CardTitle>
+            <CardDescription>
+              Full keys are only shown once at creation. Paste an existing key or generate a new embed key.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            <div className="space-y-2">
+              <Label htmlFor="widget-api-key">Paste API key</Label>
+              <Input
+                id="widget-api-key"
+                value={draftKey}
+                onChange={(e) => setDraftKey(e.target.value)}
+                placeholder="sk_..."
+                className="font-mono text-sm"
+              />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                onClick={() => onSaveApiKey(draftKey)}
+                disabled={!draftKey.trim().startsWith("sk_")}
+              >
+                Use this key
+              </Button>
+              <Button type="button" variant="outline" onClick={onCreateEmbedKey} disabled={creatingKey}>
+                {creatingKey ? "Creating..." : "Create new embed key"}
+              </Button>
+              <Link className={buttonVariants({ variant: "ghost" })} href="/api">
+                Manage keys
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle>Embed configuration</CardTitle>
@@ -70,17 +132,28 @@ export function WidgetEmbedPanel({ companyId, apiKey, companyName }: Props) {
           <div className="space-y-2">
             <Label>API key in embed</Label>
             <div className="flex items-center gap-2 rounded-md border bg-muted p-2 font-mono text-xs break-all">
-              <span className="flex-1">{showKey ? apiKey : "•".repeat(24)}</span>
-              <Button type="button" size="icon" variant="ghost" onClick={() => setShowKey((v) => !v)}>
-                {showKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </Button>
+              <span className="flex-1">{showKey ? resolvedKey || "YOUR_API_KEY" : "•".repeat(24)}</span>
+              {resolvedKey ? (
+                <Button type="button" size="icon" variant="ghost" onClick={() => setShowKey((v) => !v)}>
+                  {showKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </Button>
+              ) : null}
             </div>
           </div>
-          <Alert>
-            <AlertDescription className="text-sm">
-              Use a production API key with limited scope. Rotate keys from the API page if exposed.
-            </AlertDescription>
-          </Alert>
+          {!resolvedKey && (
+            <Alert>
+              <AlertDescription className="text-sm">
+                Replace YOUR_API_KEY in the embed script after you paste or create a key above.
+              </AlertDescription>
+            </Alert>
+          )}
+          {resolvedKey && (
+            <Alert>
+              <AlertDescription className="text-sm">
+                Use a production API key with limited scope. Rotate keys from the API page if exposed.
+              </AlertDescription>
+            </Alert>
+          )}
         </CardContent>
       </Card>
 

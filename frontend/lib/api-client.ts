@@ -1,5 +1,6 @@
 import type { ApiAuth } from "@/lib/api-auth"
 import { buildAuthHeaders } from "@/lib/api-auth"
+import { isAuthError, logoutAndRedirectToLogin } from "@/lib/auth-session"
 
 export const API_BASE_URL = process.env.API_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000/api/v1"
 
@@ -40,6 +41,9 @@ export async function apiClient<T>(path: string, init: RequestInit = {}, auth?: 
       detail = body.detail || JSON.stringify(body)
     } catch {
       detail = response.statusText || detail
+    }
+    if (typeof window !== "undefined" && isAuthError(response.status, detail)) {
+      logoutAndRedirectToLogin()
     }
     throw new APIError(response.status, detail)
   }

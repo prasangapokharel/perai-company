@@ -1,39 +1,69 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import Link from "next/link"
 
 import { WidgetEmbedPanel } from "@/components/widget/WidgetEmbedPanel"
-import { loadAuthSession, saveAuthSession } from "@/features/auth/hooks"
-import { ensureDefaultApiKey } from "@/services/session-bootstrap.service"
+import { loadAuthSession, type AuthSession } from "@/features/auth/hooks"
+import {
+  createEmbedApiKey,
+  ensureDefaultApiKey,
+  saveEmbedApiKey,
+} from "@/services/session-bootstrap.service"
 import { buttonVariants } from "@/components/ui/button"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { APIError } from "@/lib/api-client"
 
 export default function WidgetPage() {
-  const [session, setSession] = useState<{
-    companyId: number
-    apiKey: string
-    accessToken?: string
-    companyName?: string
-  } | null>(null)
+  const [session, setSession] = useState<AuthSession | null>(null)
   const [loading, setLoading] = useState(true)
-  const [needsNewKey, setNeedsNewKey] = useState(false)
+  const [creatingKey, setCreatingKey] = useState(false)
+  const [error, setError] = useState("")
 
   useEffect(() => {
     async function load() {
-      let sess = loadAuthSession()
+      const sess = loadAuthSession()
       if (!sess) {
         setLoading(false)
         return
       }
-      sess = await ensureDefaultApiKey(sess)
-      saveAuthSession(sess)
-      setSession(sess)
-      setNeedsNewKey(!sess.apiKey)
-      setLoading(false)
+      try {
+        const ready = await ensureDefaultApiKey(sess)
+        setSession(ready)
+      } catch (err) {
+        if (err instanceof APIError) setError(err.detail)
+        else if (err instanceof Error) setError(err.message)
+        else setError("Failed to load widget settings")
+        setSession(sess)
+      } finally {
+        setLoading(false)
+      }
     }
     load()
   }, [])
+
+  const handleSaveApiKey = useCallback(
+    (apiKey: string) => {
+      if (!session) return
+      setSession(saveEmbedApiKey(session, apiKey))
+      setError("")
+    },
+    [session],
+  )
+
+  const handleCreateEmbedKey = useCallback(async () => {
+    if (!session) return
+    setCreatingKey(true)
+    setError("")
+    try {
+      setSession(await createEmbedApiKey(session))
+    } catch (err) {
+      if (err instanceof APIError) setError(err.detail)
+      else if (err instanceof Error) setError(err.message)
+      else setError("Failed to create embed API key")
+    } finally {
+      setCreatingKey(false)
+    }
+  }, [session])
 
   if (loading) {
     return (
@@ -59,25 +89,15 @@ export default function WidgetPage() {
         </Link>
       </div>
 
-      {needsNewKey && (
-        <Alert>
-          <AlertDescription>
-            Create an API key on the{" "}
-            <Link href="/api" className="font-medium underline">
-              API page
-            </Link>{" "}
-            to generate embed code. The full key is saved in this browser when you create it.
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {session.apiKey ? (
-        <WidgetEmbedPanel
-          companyId={session.companyId}
-          apiKey={session.apiKey}
-          companyName={session.companyName}
-        />
-      ) : null}
+      <WidgetEmbedPanel
+        companyId={session.companyId}
+        apiKey={session.apiKey || ""}
+        companyName={session.companyName}
+        error={error}
+        creatingKey={creatingKey}
+        onSaveApiKey={handleSaveApiKey}
+        onCreateEmbedKey={handleCreateEmbedKey}
+      />
     </div>
   )
 }

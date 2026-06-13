@@ -11,3 +11,5 @@ storage/companies/**/*
 !storage/companies/logo/placeholder.png
 app/core/finetune/rag/companies/**/*
 !app/core/finetune/rag/companies/.gitkeep
+*.mypy_cache
+*.pytest_cache

@@ -4,6 +4,8 @@ import * as React from "react"
 
 import type { ApiAuth } from "@/lib/api-auth"
 
+import { clearAuthCookie, setAuthCookie } from "@/lib/auth-cookie"
+
 export type AuthSession = {
   companyId: number
   apiKey: string
@@ -36,12 +38,16 @@ export function saveAuthSession(session: AuthSession) {
   if (session.apiKey) {
     localStorage.setItem(apiKeyStorageKey(session.companyId), session.apiKey)
   }
+  if (session.accessToken || session.apiKey) {
+    setAuthCookie()
+  }
 }
 
 export { saveAuthSession as persistAuthSession }
 
 export function clearAuthSession() {
   window.sessionStorage.removeItem(AUTH_SESSION_KEY)
+  clearAuthCookie()
 }
 
 export function sessionAuth(session: AuthSession): ApiAuth {

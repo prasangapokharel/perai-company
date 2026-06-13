@@ -4,13 +4,14 @@ import * as React from "react"
 import { useRouter } from "next/navigation"
 
 import { isAuthenticatedSession, loadAuthSession } from "@/features/auth/hooks"
+import { hasAuthCookie } from "@/lib/auth-cookie"
 
 export function GuestOnly({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const [allowed, setAllowed] = React.useState(false)
 
   React.useEffect(() => {
-    if (isAuthenticatedSession(loadAuthSession())) {
+    if (hasAuthCookie() && isAuthenticatedSession(loadAuthSession())) {
       router.replace("/dashboard")
       return
     }
