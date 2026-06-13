@@ -9,7 +9,49 @@ load_dotenv(_env_file)
 
 BASE_DIR: Path = Path(__file__).resolve().parents[3]
 
-DATABASE_URL: str = getenv("DB_URL", f"sqlite:///{BASE_DIR / 'perai.db'}")
+SUPABASE_URL: str = getenv("SUPABASE_URL", "")
+SUPABASE_KEY: str = getenv("SUPABASE_KEY", "")
+SUPABASE_PASSWORD: str = getenv("SUPABASE_PASSWORD", "")
+
+DB_HOST: str = getenv("DB_HOST", "aws-1-ap-south-1.pooler.supabase.com")
+DB_HOST_FALLBACK: str = getenv("DB_HOST_FALLBACK", "db.lxopuyaxcxrglkfcbree.supabase.co")
+DB_PORT: str = getenv("DB_PORT", "5432")
+DB_NAME: str = getenv("DB_NAME", "postgres")
+DB_USER: str = getenv("DB_USER", "postgres.lxopuyaxcxrglkfcbree")
+DB_USER_DIRECT: str = getenv("DB_USER_DIRECT", "postgres")
+
+
+def _build_postgres_url(user: str, host: str, password: str) -> str:
+    from urllib.parse import quote_plus
+
+    if not password:
+        return ""
+    safe_password = quote_plus(password)
+    return f"postgresql://{user}:{safe_password}@{host}:{DB_PORT}/{DB_NAME}"
+
+
+def _load_database_urls() -> tuple[str, str | None]:
+    explicit = getenv("DB_URL", "").strip()
+    explicit_fallback = getenv("DB_URL_FALLBACK", "").strip()
+
+    pooler_url = explicit or _build_postgres_url(DB_USER, DB_HOST, SUPABASE_PASSWORD)
+    direct_url = explicit_fallback or _build_postgres_url(
+        DB_USER_DIRECT, DB_HOST_FALLBACK, SUPABASE_PASSWORD
+    )
+
+    if pooler_url:
+        primary = pooler_url
+    elif direct_url:
+        primary = direct_url
+        direct_url = None
+    else:
+        primary = f"sqlite:///{BASE_DIR / 'perai.db'}"
+
+    fallback = direct_url if direct_url and direct_url != primary else None
+    return primary, fallback
+
+
+DATABASE_URL, DATABASE_URL_FALLBACK = _load_database_urls()
 
 JWT_SECRET: str = getenv("JWT_SECRET", "changeme-please-set-JWT_SECRET-in-env")
 JWT_ALGORITHM: str = "HS256"

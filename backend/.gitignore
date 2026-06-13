@@ -2,7 +2,6 @@ venv/
 __pycache__/
 *.pyc
 .env
-.env.example
 .env.local
 *.env.local
 test.db

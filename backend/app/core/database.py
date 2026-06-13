@@ -2,15 +2,45 @@
 
 from collections.abc import Generator
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session, declarative_base, sessionmaker
 
-from app.core.config.config import DATABASE_URL
+from app.core.config.config import DATABASE_URL, DATABASE_URL_FALLBACK
 
 
-connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+def _probe_engine(url: str):
+    candidate = create_engine(
+        url,
+        connect_args={"check_same_thread": False} if url.startswith("sqlite") else {},
+        future=True,
+        pool_pre_ping=True,
+    )
+    if url.startswith("sqlite"):
+        return candidate
+    with candidate.connect() as conn:
+        conn.execute(text("SELECT 1"))
+    return candidate
 
-engine = create_engine(DATABASE_URL, connect_args=connect_args, future=True)
+
+def _create_engine():
+    urls = [DATABASE_URL]
+    if DATABASE_URL_FALLBACK:
+        urls.append(DATABASE_URL_FALLBACK)
+
+    last_error: Exception | None = None
+    for url in urls:
+        try:
+            return _probe_engine(url)
+        except Exception as err:
+            last_error = err
+            continue
+
+    if last_error:
+        raise last_error
+    raise RuntimeError("No database URL configured")
+
+
+engine = _create_engine()
 
 if DATABASE_URL.startswith("sqlite"):
     from sqlalchemy import event

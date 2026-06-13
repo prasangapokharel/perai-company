@@ -75,7 +75,9 @@ backend/py/       Local TTS experiments (Supertonic / ONNX)
 
 | Variable | Purpose |
 |----------|---------|
-| `DB_URL` | PostgreSQL connection string |
+| `DB_URL` | Primary Postgres URL (Supabase pooler) |
+| `DB_URL_FALLBACK` | Direct Supabase host if pooler fails |
+| `DB_HOST` / `DB_USER` | Pooler host and user (auto-builds URL if `DB_URL` omitted) |
 | `GROQ_API_KEY` | Groq API key (supports `GROQ_API_KEY2`–`5` fallback) |
 | `JWT_SECRET` | Dashboard JWT signing |
 | `RAG_TOP_K` | Max RAG records per query (default `3`) |

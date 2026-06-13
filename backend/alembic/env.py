@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from logging.config import fileConfig
-from os import getenv
 
 from alembic import context
 from sqlalchemy import engine_from_config, pool
@@ -30,12 +29,9 @@ target_metadata = Base.metadata
 
 
 def _database_url() -> str:
-    from dotenv import load_dotenv
-    from pathlib import Path
+    from app.core.config.config import DATABASE_URL
 
-    env_file = Path(__file__).resolve().parents[1] / ".env"
-    load_dotenv(env_file)
-    return getenv("DB_URL", config.get_main_option("sqlalchemy.url"))
+    return DATABASE_URL
 
 
 def run_migrations_offline() -> None:
