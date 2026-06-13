@@ -2,22 +2,40 @@
 
 import * as React from "react"
 
+import type { ApiAuth } from "@/lib/api-auth"
+
 export type AuthSession = {
   companyId: number
   apiKey: string
+  accessToken?: string
+  balance?: string
+  currency?: string
   companyName?: string
 }
 
 const AUTH_SESSION_KEY = "perai_auth_session"
 
+function apiKeyStorageKey(companyId: number) {
+  return `perai_api_key_${companyId}`
+}
+
 export function loadAuthSession(): AuthSession | null {
   if (typeof window === "undefined") return null
   const raw = window.sessionStorage.getItem(AUTH_SESSION_KEY)
-  return raw ? (JSON.parse(raw) as AuthSession) : null
+  if (!raw) return null
+  const session = JSON.parse(raw) as AuthSession
+  if (!session.apiKey) {
+    const stored = localStorage.getItem(apiKeyStorageKey(session.companyId))
+    if (stored) session.apiKey = stored
+  }
+  return session
 }
 
 export function saveAuthSession(session: AuthSession) {
   window.sessionStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(session))
+  if (session.apiKey) {
+    localStorage.setItem(apiKeyStorageKey(session.companyId), session.apiKey)
+  }
 }
 
 export { saveAuthSession as persistAuthSession }
@@ -26,11 +44,24 @@ export function clearAuthSession() {
   window.sessionStorage.removeItem(AUTH_SESSION_KEY)
 }
 
+export function sessionAuth(session: AuthSession): ApiAuth {
+  return {
+    apiKey: session.apiKey || undefined,
+    accessToken: session.accessToken,
+  }
+}
+
+export function isAuthenticatedSession(session: AuthSession | null): boolean {
+  return !!session && (!!session.accessToken || !!session.apiKey)
+}
+
 export function useAuthSession() {
-  const [session, setSession] = React.useState<AuthSession | null>(null)
+  const [session, setSession] = React.useState<AuthSession | null>(() => loadAuthSession())
+  const [checked, setChecked] = React.useState(false)
 
   React.useEffect(() => {
     setSession(loadAuthSession())
+    setChecked(true)
   }, [])
 
   const refresh = React.useCallback(() => {
@@ -39,7 +70,8 @@ export function useAuthSession() {
 
   return {
     session,
-    isReady: session !== null,
+    checked,
+    isAuthenticated: isAuthenticatedSession(session),
     refresh,
     clear: () => {
       clearAuthSession()

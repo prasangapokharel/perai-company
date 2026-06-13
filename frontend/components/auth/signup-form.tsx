@@ -13,11 +13,11 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { registerCompany, createCompanyAPIKey } from "@/services/auth.service"
+import { registerCompany, loginCompany } from "@/services/auth.service"
+import { ensureDefaultApiKey } from "@/services/session-bootstrap.service"
 import { saveAuthSession } from "@/features/auth/hooks"
 import { APIError } from "@/lib/api-client"
-import { HugeiconsIcon } from "@hugeicons/react"
-import { LayoutBottomIcon } from "@hugeicons/core-free-icons"
+import { AuthLogo } from "@/components/auth/AuthLogo"
 
 export function SignupForm({
   className,
@@ -49,23 +49,18 @@ export function SignupForm({
         password,
       })
 
-      // Create API key
-      const expiry = new Date()
-      expiry.setDate(expiry.getDate() + 90)
-      const apiKey = await createCompanyAPIKey(
-        company.id,
-        "default",
-        expiry.toISOString()
-      )
+      const login = await loginCompany(email, password)
 
-      // Save session
-      saveAuthSession({
+      let session = {
         companyId: company.id,
-        apiKey: apiKey.key,
+        apiKey: "",
+        accessToken: login.access_token,
         companyName: company.company_name,
-      })
+        currency: "USD",
+      }
+      session = await ensureDefaultApiKey(session)
+      saveAuthSession(session)
 
-      // Redirect to dashboard
       router.push("/dashboard")
     } catch (err) {
       if (err instanceof APIError) {
@@ -85,15 +80,7 @@ export function SignupForm({
       <form onSubmit={handleSignup}>
         <FieldGroup>
           <div className="flex flex-col items-center gap-2 text-center">
-            <a
-              href="#"
-              className="flex flex-col items-center gap-2 font-medium"
-            >
-              <div className="flex size-8 items-center justify-center rounded-md">
-                <HugeiconsIcon icon={LayoutBottomIcon} strokeWidth={2} className="size-6" />
-              </div>
-              <span className="sr-only">Perai</span>
-            </a>
+            <AuthLogo />
             <h1 className="text-xl font-bold">Create your account</h1>
             <FieldDescription>
               Already have an account?{" "}

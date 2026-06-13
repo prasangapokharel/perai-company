@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useAuthSession } from "@/features/auth/hooks"
+import { useAuthSession, sessionAuth } from "@/features/auth/hooks"
 import { APIError } from "@/lib/api-client"
 import { createOrUpdateCompanySettings, getCompanySettings } from "@/services/companySettings.service"
 import {
@@ -33,7 +33,7 @@ export function CompanySettingsPanel() {
     async function load() {
       if (!session) return
       try {
-        const data = await getCompanySettings(session.companyId, session.apiKey)
+        const data = await getCompanySettings(session.companyId, sessionAuth(session))
         setLanguage(data.language)
         setTone(data.tone)
         setMaxTokens(String(data.max_tokens))
@@ -52,7 +52,7 @@ export function CompanySettingsPanel() {
       await createOrUpdateCompanySettings(
         session.companyId,
         { language: language as "english" | "nepali", tone: tone as any, max_tokens: Number(maxTokens) },
-        session.apiKey,
+        sessionAuth(session),
       )
       setStatus("Saved")
     } catch (err) {
@@ -65,7 +65,7 @@ export function CompanySettingsPanel() {
     if (!session) return
     setStatus("Deleting...")
     try {
-      await deleteCompanySettings(session.companyId, session.apiKey)
+      await deleteCompanySettings(session.companyId, sessionAuth(session))
       setStatus("Deleted")
       setDeleteOpen(false)
     } catch (err) {

@@ -10,6 +10,7 @@ from app.core.database import Base
 
 class APIKeyStatus(str, enum.Enum):
     """API key status enum."""
+
     ACTIVE = "active"
     REVOKED = "revoked"
     EXPIRED = "expired"
@@ -29,7 +30,9 @@ class Company(Base):
     logo = Column(String(500), nullable=True)
     website = Column(String(500), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+    updated_at = Column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
 
     finetunes = relationship(
         "CompanyFinetune",
@@ -45,6 +48,42 @@ class Company(Base):
         lazy="selectin",
     )
 
+    company_requests = relationship(
+        "CompanyRequest",
+        back_populates="company",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )
+
+    chat_messages = relationship(
+        "ChatMessage",
+        back_populates="company",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )
+
+    balance_account = relationship(
+        "CompanyBalance",
+        back_populates="company",
+        cascade="all, delete-orphan",
+        uselist=False,
+        lazy="selectin",
+    )
+
+    balance_deductions = relationship(
+        "BalanceDeduct",
+        back_populates="company",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )
+
+    balance_topups = relationship(
+        "BalanceTopup",
+        back_populates="company",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )
+
     @property
     def company_model_name(self) -> str | None:
         """Get company model name from finetune data."""
@@ -55,9 +94,7 @@ class Company(Base):
 
 class CompanyFinetune(Base):
     __tablename__ = "company_finetune"
-    __table_args__ = (
-        UniqueConstraint("company_id", name="uq_company_finetune_company_id"),
-    )
+    __table_args__ = (UniqueConstraint("company_id", name="uq_company_finetune_company_id"),)
 
     id = Column(Integer, primary_key=True, index=True)
     company_id = Column(
@@ -69,13 +106,16 @@ class CompanyFinetune(Base):
     company_model_name = Column(String(255), nullable=False, index=True)  # perai-{company_name}
     rag_company_path = Column(String(1000), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+    updated_at = Column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
 
     company = relationship("Company", back_populates="finetunes", lazy="selectin")
 
 
 class APIKey(Base):
     """API Key model for company authentication."""
+
     __tablename__ = "api_key"
     __table_args__ = (
         UniqueConstraint("key_hash", name="uq_api_key_key_hash"),
@@ -101,6 +141,8 @@ class APIKey(Base):
     expiry_date = Column(DateTime(timezone=True), nullable=True)
     last_used_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+    updated_at = Column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
 
     company = relationship("Company", backref="api_keys", lazy="selectin")

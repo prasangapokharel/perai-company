@@ -1,6 +1,8 @@
 import type { ReactNode } from "react"
 
 import { AppSidebar } from "@/components/sidebar/app-sidebar"
+import { CompanyHeaderMenu } from "@/components/layout/company-header-menu"
+import { ThemeToggle } from "@/components/layout/theme-toggle"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -42,6 +44,10 @@ export function CompanyShell({
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
+          <div className="ml-auto flex items-center gap-1">
+            <ThemeToggle />
+            <CompanyHeaderMenu />
+          </div>
         </header>
         <ScrollArea className="flex flex-1">
           <div className="flex flex-1 flex-col gap-4 p-4">{children}</div>

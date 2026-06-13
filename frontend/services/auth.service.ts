@@ -1,17 +1,5 @@
-import { apiClient } from "@/lib/api-client"
-
-export type AuthPayload = {
-  email: string
-  password: string
-}
-
-export type AuthRegisterPayload = {
-  company_name: string
-  company_email: string
-  password: string
-  logo?: string
-  website?: string
-}
+import { apiClientAuth } from "@/lib/api-auth"
+import type { CompanyRead } from "@/services/auth.service"
 
 export type CompanyRead = {
   id: number
@@ -24,64 +12,47 @@ export type CompanyRead = {
   updated_at: string
 }
 
-export type AuthLoginResponse = {
-  message: string
-  company: CompanyRead
-  api_key_instruction: string
-}
-
-export type APIKeyCreateResponse = {
-  id: number
+export type AuthMeResponse = {
   company_id: number
-  name: string
-  key: string
-  key_preview: string
-  status: string
-  expiry_date?: string | null
-  created_at: string
+  company_name: string
+  company_email: string
+  balance: string
+  currency: string
 }
 
-/**
- * Register a new company
- */
-export async function registerCompany(
-  payload: AuthRegisterPayload
-): Promise<CompanyRead> {
-  return apiClient<CompanyRead>("/auth/register", {
+export type AuthLoginResponse = {
+  access_token: string
+  token_type: string
+  company: CompanyRead
+}
+
+export type AuthRegisterPayload = {
+  company_name: string
+  company_email: string
+  password: string
+  logo?: string
+  website?: string
+}
+
+export type AuthPayload = {
+  email: string
+  password: string
+}
+
+export async function registerCompany(payload: AuthRegisterPayload): Promise<CompanyRead> {
+  return apiClientAuth<CompanyRead>("/auth/register", {
     method: "POST",
     body: JSON.stringify(payload),
   })
 }
 
-/**
- * Login company with email and password
- */
-export async function loginCompany(
-  email: string,
-  password: string
-): Promise<AuthLoginResponse> {
-  return apiClient<AuthLoginResponse>("/auth/login", {
+export async function loginCompany(email: string, password: string): Promise<AuthLoginResponse> {
+  return apiClientAuth<AuthLoginResponse>("/auth/login", {
     method: "POST",
     body: JSON.stringify({ email, password }),
   })
 }
 
-/**
- * Create an API key for a company
- */
-export async function createCompanyAPIKey(
-  companyId: number,
-  name: string,
-  expiryDate?: string
-): Promise<APIKeyCreateResponse> {
-  return apiClient<APIKeyCreateResponse>(
-    `/company/${companyId}/api-keys`,
-    {
-      method: "POST",
-      body: JSON.stringify({
-        name,
-        expiry_date: expiryDate,
-      }),
-    }
-  )
+export async function getAuthMe(auth: { apiKey?: string; accessToken?: string }) {
+  return apiClientAuth<AuthMeResponse>("/auth/me", {}, auth)
 }

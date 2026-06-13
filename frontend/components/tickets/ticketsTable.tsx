@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty"
-import { useAuthSession } from "@/features/auth/hooks"
+import { sessionAuth, useAuthSession } from "@/features/auth/hooks"
 import { listTickets, type Ticket } from "@/services/ticket.service"
 import { APIError } from "@/lib/api-client"
 
@@ -27,7 +27,7 @@ export function TicketsTable() {
     async function load() {
       try {
         if (!session) return
-        const data = await listTickets(session.companyId, {}, session.apiKey)
+        const data = await listTickets(session.companyId, {}, sessionAuth(session))
         setTickets(data)
       } catch (err) {
         if (err instanceof APIError) setError(err.detail)

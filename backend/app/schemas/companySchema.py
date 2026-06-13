@@ -1,6 +1,7 @@
 """Company schemas."""
 
 from datetime import datetime
+from decimal import Decimal
 from enum import Enum
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -8,6 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class APIKeyStatus(str, Enum):
     """API key status."""
+
     ACTIVE = "active"
     REVOKED = "revoked"
     EXPIRED = "expired"
@@ -15,12 +17,14 @@ class APIKeyStatus(str, Enum):
 
 class APIKeyCreate(BaseModel):
     """Create API key request."""
+
     name: str = Field(..., min_length=1, max_length=255, description="Key name/label")
     expiry_date: datetime | None = Field(default=None, description="Optional expiry date")
 
 
 class APIKeyRead(BaseModel):
     """API key response (safe to show)."""
+
     id: int
     company_id: int
     name: str
@@ -36,6 +40,7 @@ class APIKeyRead(BaseModel):
 
 class APIKeyCreateResponse(BaseModel):
     """API key creation response (includes full key)."""
+
     id: int
     company_id: int
     name: str
@@ -50,6 +55,7 @@ class APIKeyCreateResponse(BaseModel):
 
 class APIKeyUpdate(BaseModel):
     """Update API key request."""
+
     name: str | None = Field(default=None, min_length=1, max_length=255)
     expiry_date: datetime | None = Field(default=None)
     status: APIKeyStatus | None = Field(default=None)
@@ -57,15 +63,17 @@ class APIKeyUpdate(BaseModel):
 
 class CompanyLogin(BaseModel):
     """Company login credentials."""
+
     email: str = Field(..., min_length=3, max_length=255, description="Company email")
     password: str = Field(..., min_length=8, max_length=255, description="Company password")
 
 
 class CompanyLoginResponse(BaseModel):
-    """Company login response."""
-    message: str
+    """Company login response — includes a short-lived JWT for bootstrapping API key creation."""
+
+    access_token: str
+    token_type: str = "bearer"
     company: "CompanyRead"
-    api_key_instruction: str
 
 
 class CompanyCreate(BaseModel):
@@ -114,15 +122,18 @@ class CompanyFinetuneRead(BaseModel):
 
 
 class ChatQuery(BaseModel):
-    """Chat query request."""
     prompt: str = Field(..., min_length=1, description="User prompt/question")
+    session_id: str | None = Field(default=None, max_length=12, description="Optional session id")
 
 
 class ChatResponse(BaseModel):
-    """Chat response."""
     model_name: str
     company_id: int
     response: str
+    balance_remaining: Decimal | None = None
+    session_id: str | None = None
+    message_id: int | None = None
+    token_consume: int | None = None
 
 
 Company = CompanyRead

@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Card } from "@/components/ui/card"
 import {
@@ -13,8 +13,9 @@ import {
   ConversationScrollButton,
 } from "@/components/chat/conversations"
 import { Message, MessageContent } from "@/components/ai/message"
-import { loadAuthSession } from "@/features/auth/hooks"
+import { loadAuthSession, sessionAuth } from "@/features/auth/hooks"
 import { queryChat } from "@/services/chat.service"
+import { getCompanyLogoUrl } from "@/services/file.service"
 import { APIError } from "@/lib/api-client"
 import { Send, Loader2 } from "lucide-react"
 
@@ -30,12 +31,13 @@ export default function ChatPage() {
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
-  const [session, setSession] = useState<any>(null)
+  const [session, setSession] = useState<ReturnType<typeof loadAuthSession>>(null)
+  const [chatSessionId, setChatSessionId] = useState<string>()
   const messageIdRef = useRef(0)
 
   useEffect(() => {
     const sess = loadAuthSession()
-    if (!sess) {
+    if (!sess?.accessToken && !sess?.apiKey) {
       router.push("/login")
       return
     }
@@ -51,6 +53,7 @@ export default function ChatPage() {
       text: input,
     }
 
+    const prompt = input
     setMessages((prev) => [...prev, userMessage])
     setInput("")
     setLoading(true)
@@ -59,17 +62,20 @@ export default function ChatPage() {
     try {
       const response = await queryChat(
         session.companyId,
-        { prompt: input },
-        session.apiKey
+        { prompt, session_id: chatSessionId },
+        sessionAuth(session),
       )
 
-      const assistantMessage: ChatMessage = {
-        id: String(messageIdRef.current++),
-        from: "assistant",
-        text: response.response,
-      }
+      if (response.session_id) setChatSessionId(response.session_id)
 
-      setMessages((prev) => [...prev, assistantMessage])
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: String(messageIdRef.current++),
+          from: "assistant",
+          text: response.response,
+        },
+      ])
     } catch (err) {
       if (err instanceof APIError) {
         setError(`Error: ${err.detail}`)
@@ -90,6 +96,9 @@ export default function ChatPage() {
     }
   }
 
+  const logoUrl = session ? getCompanyLogoUrl(session.companyId) : undefined
+  const companyInitial = session?.companyName?.slice(0, 1).toUpperCase() ?? "C"
+
   return (
     <div className="flex flex-col h-[calc(100vh-120px)] gap-4">
       <div>
@@ -97,7 +106,7 @@ export default function ChatPage() {
         <p className="text-muted-foreground">
           Ask questions about your company knowledge base
         </p>
-        <Button variant="outline" size="sm" className="mt-3" onClick={() => router.push("/models") }>
+        <Button variant="outline" size="sm" className="mt-3" onClick={() => router.push("/models")}>
           View model
         </Button>
       </div>
@@ -120,12 +129,23 @@ export default function ChatPage() {
           <Conversation>
             <ConversationContent>
               {messages.map((msg) => (
-                <Message from={msg.from} key={msg.id}>
-                  <MessageContent>{msg.text}</MessageContent>
+                <Message
+                  from={msg.from}
+                  key={msg.id}
+                  avatarSrc={msg.from === "assistant" ? logoUrl : undefined}
+                  avatarFallback={msg.from === "assistant" ? companyInitial : "U"}
+                >
+                  <MessageContent markdown={msg.from === "assistant"}>
+                    {msg.text}
+                  </MessageContent>
                 </Message>
               ))}
               {loading && (
-                <Message from="assistant">
+                <Message
+                  from="assistant"
+                  avatarSrc={logoUrl}
+                  avatarFallback={companyInitial}
+                >
                   <MessageContent className="flex items-center gap-2">
                     <Loader2 className="h-4 w-4 animate-spin" />
                     Thinking...
@@ -138,14 +158,15 @@ export default function ChatPage() {
         )}
 
         <div className="border-t p-4 bg-background">
-          <div className="flex gap-2">
-            <Input
+          <div className="flex gap-2 items-end">
+            <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Type your message..."
               disabled={loading}
-              className="flex-1"
+              rows={2}
+              className="flex-1 min-h-[44px] max-h-32 resize-none"
             />
             <Button
               onClick={handleSendMessage}

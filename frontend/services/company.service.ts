@@ -1,3 +1,4 @@
+import type { ApiAuth } from "@/lib/api-auth"
 import { apiClient } from "@/lib/api-client"
 
 export type Company = {
@@ -30,26 +31,26 @@ export type CompanyFinetune = {
 
 export type CompanyListResponse = Company[]
 
-export function listCompanies(apiKey?: string) {
-  return apiClient<Company[]>("/company", {}, apiKey)
+export function listCompanies(auth?: ApiAuth | string) {
+  return apiClient<Company[]>("/company", {}, auth)
 }
 
 export function createCompany(payload: CompanyCreateInput) {
   return apiClient<Company>("/company", { method: "POST", body: JSON.stringify(payload) })
 }
 
-export function getCompany(companyId: number, apiKey?: string) {
-  return apiClient<Company>(`/company/${companyId}`, {}, apiKey)
+export function getCompany(companyId: number, auth?: ApiAuth | string) {
+  return apiClient<Company>(`/company/${companyId}`, {}, auth)
 }
 
-export function updateCompany(companyId: number, payload: CompanyUpdateInput, apiKey?: string) {
-  return apiClient<Company>(`/company/${companyId}`, { method: "PUT", body: JSON.stringify(payload) }, apiKey)
+export function updateCompany(companyId: number, payload: CompanyUpdateInput, auth?: ApiAuth | string) {
+  return apiClient<Company>(`/company/${companyId}`, { method: "PUT", body: JSON.stringify(payload) }, auth)
 }
 
-export function getCompanyFinetune(companyId: number, apiKey?: string) {
-  return apiClient<CompanyFinetune>(`/company/${companyId}/finetune`, {}, apiKey)
+export function getCompanyFinetune(companyId: number, auth?: ApiAuth | string) {
+  return apiClient<CompanyFinetune>(`/company/${companyId}/finetune`, {}, auth)
 }
 
-export function upsertCompanyFinetune(companyId: number, content: string, apiKey?: string) {
-  return apiClient<CompanyFinetune>(`/company/${companyId}/finetune`, { method: "POST", body: JSON.stringify({ content }) }, apiKey)
+export function upsertCompanyFinetune(companyId: number, content: string, auth?: ApiAuth | string) {
+  return apiClient<CompanyFinetune>(`/company/${companyId}/finetune`, { method: "POST", body: JSON.stringify({ content }) }, auth)
 }

@@ -6,23 +6,27 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
-import { useAuthSession } from "@/features/auth/hooks"
+import { useAuthSession, sessionAuth } from "@/features/auth/hooks"
 import { getCompany } from "@/services/company.service"
 import { APIError } from "@/lib/api-client"
 import { useRouter } from "next/navigation"
 
 export function ModelsPanel() {
   const router = useRouter()
-  const { session } = useAuthSession()
+  const { session, checked } = useAuthSession()
   const [company, setCompany] = React.useState<any>(null)
   const [error, setError] = React.useState("")
   const [loading, setLoading] = React.useState(true)
 
   React.useEffect(() => {
     async function load() {
+      if (!checked) return
+      if (!session) {
+        router.push("/login")
+        return
+      }
       try {
-        if (!session) return
-        const data = await getCompany(session.companyId, session.apiKey)
+        const data = await getCompany(session.companyId, sessionAuth(session))
         setCompany(data)
       } catch (err) {
         if (err instanceof APIError) setError(err.detail)
@@ -34,9 +38,9 @@ export function ModelsPanel() {
     }
 
     load()
-  }, [session])
+  }, [session, checked, router])
 
-  if (loading) return <p className="text-sm text-muted-foreground">Loading models...</p>
+  if (!checked || loading) return <p className="text-sm text-muted-foreground">Loading models...</p>
 
   if (!company) {
     return (

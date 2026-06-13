@@ -2,33 +2,19 @@
 
 from __future__ import annotations
 
-import hashlib
-import hmac
-from secrets import token_bytes
-
 from sqlalchemy.orm import Session
 
+from app.utils.password import hash_password, verify_password  # noqa: F401
+from app.utils.jsonl import normalize_jsonl_upload
 from app.core.finetune.rag.main import (
     delete_training_file_for_company,
     load_training_file_for_company,
     save_training_file_for_company,
 )
-from app.core.file_storage import delete_company_storage
+from app.utils.file_storage import delete_company_storage
 from app.models.company import Company, CompanyFinetune
 from app.schemas.companySchema import CompanyCreate, CompanyFinetuneUpload, CompanyUpdate
 
-
-def hash_password(password: str) -> str:
-    salt = token_bytes(16)
-    digest = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, 200000)
-    return f"{salt.hex()}${digest.hex()}"
-
-
-def verify_password(password: str, hashed: str) -> bool:
-    salt_hex, digest_hex = hashed.split("$", 1)
-    salt = bytes.fromhex(salt_hex)
-    candidate = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, 200000)
-    return hmac.compare_digest(candidate.hex(), digest_hex)
 
 
 def list_companies(db: Session) -> list[Company]:
@@ -101,15 +87,14 @@ def upsert_company_finetune(
     payload: CompanyFinetuneUpload,
 ) -> CompanyFinetune:
     company = get_company(db, company_id)
-    path = save_training_file_for_company(company.id, payload.content)
-    
+    knowledge = normalize_jsonl_upload(payload.content)
+    path = save_training_file_for_company(company.id, knowledge)
+
     # Generate model name as perai-{company_name}
     model_name = f"perai-{company.company_name.lower().replace(' ', '-')}"
 
     finetune = (
-        db.query(CompanyFinetune)
-        .filter(CompanyFinetune.company_id == company.id)
-        .one_or_none()
+        db.query(CompanyFinetune).filter(CompanyFinetune.company_id == company.id).one_or_none()
     )
     if finetune is None:
         finetune = CompanyFinetune(
@@ -130,9 +115,7 @@ def upsert_company_finetune(
 
 def get_company_finetune(db: Session, company_id: int) -> CompanyFinetune:
     finetune = (
-        db.query(CompanyFinetune)
-        .filter(CompanyFinetune.company_id == company_id)
-        .one_or_none()
+        db.query(CompanyFinetune).filter(CompanyFinetune.company_id == company_id).one_or_none()
     )
     if not finetune:
         raise ValueError("Company finetune not found")

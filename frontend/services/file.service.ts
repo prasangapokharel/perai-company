@@ -1,4 +1,4 @@
-import { apiClient } from "@/lib/api-client"
+import { apiClient, API_BASE_URL } from "@/lib/api-client"
 
 export type CompanyFile = {
   filename: string
@@ -29,7 +29,7 @@ export function uploadCompanyLogo(companyId: number, file: File, apiKey?: string
 }
 
 export function downloadCompanyLogo(companyId: number) {
-  return `${process.env.API_URL ?? "http://localhost:8000/api/v1"}/files/companies/${companyId}/logo`
+  return `${API_BASE_URL}/files/companies/${companyId}/logo`
 }
 
 export function uploadCompanyContent(companyId: number, file: File, apiKey?: string) {
@@ -44,7 +44,7 @@ export function uploadCompanyContent(companyId: number, file: File, apiKey?: str
 }
 
 export function getCompanyLogoUrl(companyId: number) {
-  return `${process.env.API_URL ?? "http://localhost:8000/api/v1"}/files/companies/${companyId}/logo`
+  return `${API_BASE_URL}/files/companies/${companyId}/logo`
 }
 
 export function listCompanyFiles(companyId: number, apiKey?: string) {
@@ -56,5 +56,5 @@ export function listCompanyFiles(companyId: number, apiKey?: string) {
 }
 
 export function downloadCompanyLogoUrl(companyId: number) {
-  return `${process.env.API_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000/api/v1"}/files/companies/${companyId}/logo`
+  return `${API_BASE_URL}/files/companies/${companyId}/logo`
 }

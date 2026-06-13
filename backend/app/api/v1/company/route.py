@@ -1,4 +1,4 @@
-"""Company API routes."""
+"""Company API routes — all protected by company ownership."""
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
@@ -9,11 +9,11 @@ from app.api.v1.company.service import (
     delete_company_finetune,
     get_company,
     get_company_finetune,
-    list_companies,
     upsert_company_finetune,
     update_company,
 )
-from app.core.database import getDb
+from app.core.database import get_db
+from app.core.security import require_company
 from app.schemas.companySchema import (
     CompanyCreate,
     CompanyFinetuneRead,
@@ -22,41 +22,40 @@ from app.schemas.companySchema import (
     CompanyUpdate,
 )
 
-
 router = APIRouter(prefix="/api/v1/company", tags=["company"])
 
 
-@router.post("", response_model=CompanyRead, status_code=status.HTTP_201_CREATED)
-def create_company_route(payload: CompanyCreate, db: Session = Depends(getDb)):
-    try:
-        return create_company(db, payload)
-    except ValueError as err:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(err)) from err
-
-
-@router.get("", response_model=list[CompanyRead])
-def list_companies_route(db: Session = Depends(getDb)):
-    return list_companies(db)
-
-
 @router.get("/{company_id}", response_model=CompanyRead)
-def get_company_route(company_id: int, db: Session = Depends(getDb)):
+def get_company_route(
+    company_id: int,
+    _: int = Depends(require_company),
+    db: Session = Depends(get_db),
+):
     try:
-        return get_company(db, company_id)
+        return CompanyRead.model_validate(get_company(db, company_id))
     except ValueError as err:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(err)) from err
 
 
 @router.put("/{company_id}", response_model=CompanyRead)
-def update_company_route(company_id: int, payload: CompanyUpdate, db: Session = Depends(getDb)):
+def update_company_route(
+    company_id: int,
+    payload: CompanyUpdate,
+    _: int = Depends(require_company),
+    db: Session = Depends(get_db),
+):
     try:
-        return update_company(db, company_id, payload)
+        return CompanyRead.model_validate(update_company(db, company_id, payload))
     except ValueError as err:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(err)) from err
 
 
 @router.delete("/{company_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_company_route(company_id: int, db: Session = Depends(getDb)):
+def delete_company_route(
+    company_id: int,
+    _: int = Depends(require_company),
+    db: Session = Depends(get_db),
+):
     try:
         delete_company(db, company_id)
     except ValueError as err:
@@ -71,24 +70,34 @@ def delete_company_route(company_id: int, db: Session = Depends(getDb)):
 def upsert_company_finetune_route(
     company_id: int,
     payload: CompanyFinetuneUpload,
-    db: Session = Depends(getDb),
+    _: int = Depends(require_company),
+    db: Session = Depends(get_db),
 ):
     try:
-        return upsert_company_finetune(db, company_id, payload)
+        finetune = upsert_company_finetune(db, company_id, payload)
+        return CompanyFinetuneRead.model_validate(finetune)
     except ValueError as err:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(err)) from err
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(err)) from err
 
 
 @router.get("/{company_id}/finetune", response_model=CompanyFinetuneRead)
-def get_company_finetune_route(company_id: int, db: Session = Depends(getDb)):
+def get_company_finetune_route(
+    company_id: int,
+    _: int = Depends(require_company),
+    db: Session = Depends(get_db),
+):
     try:
-        return get_company_finetune(db, company_id)
+        return CompanyFinetuneRead.model_validate(get_company_finetune(db, company_id))
     except ValueError as err:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(err)) from err
 
 
 @router.delete("/{company_id}/finetune", status_code=status.HTTP_204_NO_CONTENT)
-def delete_company_finetune_route(company_id: int, db: Session = Depends(getDb)):
+def delete_company_finetune_route(
+    company_id: int,
+    _: int = Depends(require_company),
+    db: Session = Depends(get_db),
+):
     try:
         delete_company_finetune(db, company_id)
     except ValueError as err:

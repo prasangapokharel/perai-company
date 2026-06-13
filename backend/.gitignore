@@ -5,3 +5,10 @@ __pycache__/
 .env.example
 .env.local
 *.env.local
+test.db
+perai.db
+storage/companies/**/*
+!storage/companies/logo/
+!storage/companies/logo/placeholder.png
+app/core/finetune/rag/companies/**/*
+!app/core/finetune/rag/companies/.gitkeep

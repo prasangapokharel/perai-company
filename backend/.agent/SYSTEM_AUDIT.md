@@ -1,516 +1,358 @@
-# PERAI System Audit & Skills Mapping
+# PERAI System Audit
 
-**Last Updated:** May 22, 2026  
-**Audit Scope:** Backend Infrastructure, Database, API Layer, Development Workflow  
-**Status:** ✅ PRODUCTION READY
+**Last Updated:** June 12, 2026
+**Audit Scope:** Backend (FastAPI) + Frontend (Next.js) — Full Stack
+**Status:** ⚠️ NOT PRODUCTION READY — Critical issues found
 
 ---
 
 ## 1. Executive Summary
 
-The Perai backend has successfully transitioned from SQLite development to production-grade Supabase PostgreSQL infrastructure. All core components have been validated and are operational. The system is now ready for:
-
-- Full company CRUD operations
-- Groq LLM integration with streaming chat
-- RAG (Retrieval-Augmented Generation) file storage
-- Alembic-managed database migrations
-- Multi-tenant data isolation
+Perai is a multi-tenant AI platform (FastAPI + Next.js 16) with Groq LLM chat, RAG finetuning, API keys, tickets, usage tracking, and a company dashboard. The feature skeleton is largely complete, but **critical security gaps, broken migrations, and several broken/incomplete frontend pages** prevent production deployment.
 
 ---
 
-## 2. Infrastructure Status
+## 2. Architecture Overview
 
-### 2.1 Database Configuration
+```
+flowchart TB
+    subgraph Frontend["Next.js 16 Frontend"]
+        Pages[App Router Pages]
+        Session[sessionStorage Auth]
+        Services[Service Layer]
+    end
+
+    subgraph Backend["FastAPI Backend"]
+        Routes[API Routes /api/v1/]
+        ServicesB[Business Services]
+        ORM[SQLAlchemy Models]
+        RAG[RAG / Finetune]
+        Groq[Groq LLM]
+    end
+
+    subgraph Storage
+        PG[(PostgreSQL / Supabase)]
+        FS[Local File Storage]
+    end
+
+    Pages --> Session
+    Pages --> Services
+    Services -->|fetch + X-API-Key header| Routes
+    Routes --> ServicesB
+    ServicesB --> ORM
+    ServicesB --> RAG
+    ServicesB --> Groq
+    ORM --> PG
+    RAG --> FS
+    ServicesB --> FS
+```
+
+---
+
+## 3. Backend Audit
+
+### 3.1 Infrastructure
 
 | Component | Status | Details |
 |-----------|--------|---------|
-| **Database Engine** | ✅ Production | PostgreSQL 17.6 on Supabase |
-| **Connection** | ✅ Verified | `postgresql://postgres:***@db.lxopuyaxcxrglkfcbree.supabase.co:5432/postgres` |
-| **ENV Loading** | ✅ Configured | `python-dotenv` configured in `app/core/config/config.py` |
-| **Driver** | ✅ Installed | `psycopg2-binary` for Python-Postgres communication |
-| **Alembic** | ✅ Ready | Migration scaffold with `0001_create_company_tables.py` applied |
+| Database Engine | ✅ | PostgreSQL 17.6 on Supabase |
+| SQLAlchemy | ✅ | v2.x, connection pooling, `get_db` dependency |
+| FastAPI | ✅ | Async, lifespan startup, auto OpenAPI docs |
+| Groq LLM | ✅ | `llama-3.3-70b-versatile`, streaming SSE |
+| RAG/Finetune | ✅ | BM25 retrieval, per-company markdown files |
+| Alembic | ⚠️ | Migrations broken — see section 3.4 |
+| CORS | ❌ | `allow_origins=["*"]` + `allow_credentials=True` (invalid combo) |
+| Auth Middleware | ❌ | No global middleware; most routes unprotected |
 
-### 2.2 Migration Status
+### 3.2 API Endpoints
 
-```
-Alembic Version Table: ✅ Created
-├── Migration: 0001 (create company and company_finetune tables)
-└── Status: Applied to Supabase Postgres
+Base URL: `http://localhost:8000`
 
-Tables Created:
-├── company (7 columns, 2 unique constraints)
-├── company_finetune (4 columns, FK to company)
-└── alembic_version (tracking table)
-```
+| Method | Path | Auth | Status |
+|--------|------|------|--------|
+| `GET` | `/` | — | Health check |
+| **Auth** | | | |
+| `POST` | `/api/v1/auth/register` | No | ✅ |
+| `POST` | `/api/v1/auth/login` | No | ✅ |
+| `GET` | `/api/v1/auth/verify/{company_id}` | No | ✅ |
+| **Company** | | | |
+| `POST` | `/api/v1/company` | ❌ None | Duplicate of register |
+| `GET` | `/api/v1/company` | ❌ None | Lists ALL companies — data leak |
+| `GET` | `/api/v1/company/{id}` | ❌ None | ✅ functional |
+| `PUT` | `/api/v1/company/{id}` | ❌ None | ✅ functional |
+| `DELETE` | `/api/v1/company/{id}` | ❌ None | ✅ functional |
+| `POST/GET/DELETE` | `/api/v1/company/{id}/finetune` | ❌ None | ✅ functional |
+| **Dashboard** | | | |
+| `GET` | `/api/v1/company/{id}/dashboard` | ❌ None | ✅ functional |
+| **API Keys** | | | |
+| `POST/GET` | `/api/v1/company/{id}/api-keys` | ❌ None | Anyone can create keys for any company |
+| `GET/PUT/DELETE` | `/api/v1/company/{id}/api-keys/{key_id}` | ❌ None | ✅ functional |
+| `POST` | `/api/v1/company/{id}/api-keys/{key_id}/revoke` | ❌ None | ✅ functional |
+| **Chat** | | | |
+| `POST` | `/api/v1/company/{id}/chat/stream` | ❌ None | SSE streaming |
+| `POST` | `/api/v1/company/{id}/chat/query` | ❌ None | Non-streaming + usage tracking |
+| `POST` | `/api/v1/company/{id}/prompt/preview` | ❌ None | System prompt preview |
+| `GET` | `/api/v1/company/{id}/chat/ping` | No | ✅ |
+| **Tickets** | | | |
+| `POST/GET` | `/api/v1/company/{id}/tickets` | ❌ None | ✅ functional |
+| `GET/PUT/DELETE` | `/api/v1/company/{id}/tickets/{ticket_id}` | ❌ None | ✅ functional |
+| `GET` | `/api/v1/company/{id}/tickets/{ticket_id}/history` | ❌ None | ✅ functional |
+| `GET` | `/api/v1/company/{id}/tickets-stats` | ❌ None | ✅ functional |
+| **Company Settings** | | | |
+| `POST/GET/PUT/DELETE` | `/api/v1/company/{id}/settings` | ✅ `X-API-Key` | ✅ functional |
+| **Files** | | | |
+| `POST` | `/api/v1/files/companies/{id}/logo` | ⚠️ Broken | `verify_api_key` returns `int`, code expects `dict` — **crashes** |
+| `GET` | `/api/v1/files/companies/{id}/logo` | ❌ None | ✅ functional |
+| `POST` | `/api/v1/files/companies/{id}/content` | ⚠️ Broken | Same crash as logo upload |
+| `GET` | `/api/v1/files/companies/{id}/list` | ⚠️ Broken | Same crash |
+| **Company Requests** | | | |
+| `GET` | `/api/v1/company/{id}/requests` | ❌ None | ✅ functional |
 
-### 2.3 Environment Configuration
+### 3.3 Database Models
 
-| Variable | Source | Value | Status |
-|----------|--------|-------|--------|
-| `DB_URL` | `.env` | `postgresql://postgres:***@db.lxopuyaxcxrglkfcbree.supabase.co:5432/postgres` | ✅ Active |
-| `GROQ_MODEL` | `.env` | `llama-3.3-70b-versatile` | ✅ Active |
-| `GROQ_API_KEY` | `.env` | `gsk_***` (masked) | ✅ Active |
-| `SUPABASE_URL` | `.env` | `https://lxopuyaxcxrglkfcbree.supabase.co` | ⚠️ Not used (direct DB instead) |
-| `SUPABASE_KEY` | `.env` | `sb_publishable_***` (masked) | ⚠️ Not used |
+| Model | Table | Key Fields | Status |
+|-------|-------|------------|--------|
+| `Company` | `company` | id, name, email, password_hash, logo, website | ✅ |
+| `CompanyFinetune` | `company_finetune` | id, company_id (unique FK), company_model_name, rag_company_path | ✅ |
+| `APIKey` | `api_key` | id, company_id, name, key_hash, key_preview, status, expiry_date | ✅ |
+| `Ticket` | `ticket` | id, company_id, issue, category (enum), status (enum) | ⚠️ Migration broken |
+| `TicketOpened` | `ticket_opened` | id, company_id, ticket_id, opened_at, closed_at | ⚠️ Migration broken |
+| `CompanySettings` | `company_settings` | id, company_id (unique FK), language, tone, max_tokens | ⚠️ No migration |
+| `CompanyRequest` | `company_requests` | id, company_id, token_consume, balance_deducted, ip, date | ✅ |
+| `ChatMessage` | `chat_message` | id, company_id, session_id, conversation, review | ⚠️ No API routes |
 
----
+**Model export gap:** `app/models/__init__.py` only exports `ChatMessage`, `Company`, `CompanyFinetune`, `CompanyRequest` — missing `Ticket`, `CompanySettings`, `APIKey`.
 
-## 3. Core Systems Status
+### 3.4 Alembic Migration Status
 
-### 3.1 Database Layer (`app/core/database.py`)
+Migration chain: `0001` → `0002` → `f920af34db03` → `886ccfbe74e8` → `fix_ticket_defaults` → `4a625b86562b` → `20260605_company_requests` → `b9033b3a73a9`
 
-**Status:** ✅ Production Ready
+| Migration | Issue |
+|-----------|-------|
+| `886ccfbe74e8_create_ticket_tables.py` | ❌ Body is just `pass` — creates nothing |
+| `fix_ticket_defaults.py` | ❌ Alters columns on tables that don't exist |
+| `4a625b86562b_create_company_settings_table.py` | ❌ **DROPS ticket and ticket_opened tables** (badly named) |
+| `company_settings` | ❌ No migration exists at all |
 
-```python
-✓ SQLAlchemy engine configured for PostgreSQL
-✓ Connection pooling enabled
-✓ Session factory (SessionLocal) operational
-✓ Base declarative model registered
-✓ init_db() function imports company models
-```
+**Result:** Running `alembic upgrade head` on a fresh DB drops ticket tables and never creates `company_settings`. Only `init_db()` `create_all` creates these tables, which conflicts with Alembic state tracking.
 
-**File:** `/home/prasanga/perai-company/backend/app/core/database.py:29`
+### 3.5 Core Utilities
 
-### 3.2 ORM Models (`app/models/company.py`)
-
-**Status:** ✅ 3NF Normalized Design
-
-```sql
-Company Table:
-  ✓ id (INTEGER PRIMARY KEY)
-  ✓ company_name (VARCHAR 255 UNIQUE)
-  ✓ company_email (VARCHAR 255 UNIQUE)
-  ✓ password_hash (VARCHAR 255)
-  ✓ logo (VARCHAR 500)
-  ✓ website (VARCHAR 500)
-  ✓ created_at (TIMESTAMP DEFAULT now())
-  ✓ updated_at (TIMESTAMP DEFAULT now())
-
-CompanyFinetune Table:
-  ✓ id (INTEGER PRIMARY KEY)
-  ✓ company_id (INTEGER FK → company.id)
-  ✓ rag_company_path (VARCHAR 1000)
-  ✓ created_at (TIMESTAMP)
-  ✓ updated_at (TIMESTAMP)
-  ✓ Unique constraint on (company_id) — one finetune per company
-```
-
-### 3.3 API Layer (`app/api/v1/`)
-
-**Status:** ✅ Implemented & Tested
-
-```
-Company Routes (company/route.py):
-  ✓ POST /api/v1/company — Create company
-  ✓ GET /api/v1/company/{id} — Retrieve company
-  ✓ PUT /api/v1/company/{id} — Update company
-  ✓ DELETE /api/v1/company/{id} — Delete company
-
-Chat Routes (chat/route.py):
-  ✓ POST /api/v1/company/{company_id}/chat/stream — SSE chat endpoint
-  ✓ Groq integration with streaming responses
-  ✓ System prompt assembly from templates
-```
-
-### 3.4 Groq Integration (`app/services/groq/groq.py`)
-
-**Status:** ✅ Configured & Tested
-
-```python
-✓ GROQ_MODEL: llama-3.3-70b-versatile
-✓ Temperature: 0.3 (conservative)
-✓ Max tokens: 1024
-✓ Streaming enabled
-✓ Error handling implemented
-```
-
-### 3.5 Prompt Engine (`app/core/finetune/prompts/builder.py`)
-
-**Status:** ✅ Disk-based Template Loading
-
-```
-Prompt Files (load from disk):
-  ✓ SystemPrompt.md — Core instructions
-  ✓ ToneInstructions.md — Company-specific tone
-
-Behavior:
-  ✓ Reads markdown templates
-  ✓ Injects company data
-  ✓ Combines with RAG knowledge base
-  ✓ Returns formatted system prompt
-```
-
-### 3.6 RAG Storage (`app/core/finetune/rag/`)
-
-**Status:** ✅ Company-Keyed File System
-
-```
-Storage Path: backend/app/core/finetune/rag/companies/{company_id}/company.md
-
-Behavior:
-  ✓ One markdown file per company_id
-  ✓ Overwrites on update (not append)
-  ✓ Contains company knowledge base
-  ✓ Used for RAG context in chat
-```
+| Module | Status | Notes |
+|--------|--------|-------|
+| `database.py` | ⚠️ | `init_db()` calls `create_all()` on startup — bypasses Alembic |
+| `security.py` | ⚠️ | `verify_api_key` creates its own DB session when used as `Depends`, closes in `finally` — fragile |
+| `api_key_utils.py` | ⚠️ | SHA-256 only, no per-key salt |
+| `file_storage.py` | ❌ | Hardcoded absolute path `/home/prasanga/.../storage/` |
+| `auth/service.py` | ❌ | Password format: `salt:hex(digest)` (100k iterations) |
+| `company/service.py` | ❌ | Password format: `salt$hex(digest)` (200k iterations) — **incompatible** |
+| `exceptions.py` | ❌ | Empty stub |
+| `middleware.py` | ❌ | Empty stub |
 
 ---
 
-## 4. Development Workflow - Skills Mapping
+## 4. Frontend Audit
 
-This section maps OpenCode agent skills to Perai system components and usage patterns.
+### 4.1 Pages & Routes
 
-### 4.1 Code Refactor Skill
+| Route | Purpose | Status |
+|-------|---------|--------|
+| `/` | Root | ❌ Stub — no redirect to login/dashboard |
+| `/login` | Company login | ✅ |
+| `/register` | Company signup | ✅ |
+| `/dashboard` | Usage metrics, credits, API keys | ✅ |
+| `/chat` | AI chat (non-streaming) | ✅ |
+| `/models` | Company model name | ✅ basic |
+| `/finetune` | View/upload knowledge base | ✅ |
+| `/settings` | AI tone/language/tokens | ✅ |
+| `/api` | API key CRUD | ✅ |
+| `/ticket` | Ticket list | ⚠️ No auth redirect |
+| `/ticket/create` | Create ticket | ✅ |
+| `/ticket/[id]` | Ticket detail | ✅ |
+| `/profile` | Company profile + logo upload | ✅ |
+| `/analytics` | Usage analytics | ❌ Empty file |
+| `/config` | Legacy finetune config | ❌ Broken imports (deleted components) |
 
-**Applicable To:** Backend Python code optimization
+### 4.2 Auth Flow
 
-| Rule | Application | Priority |
-|------|-------------|----------|
-| Variable naming | Use `cfg`, `db`, `err` for local variables | Medium |
-| Type safety | Add `from typing import` annotations | High |
-| Function simplicity | Keep endpoints under 50 LOC | High |
-| Code duplication | Extract shared logic to services | High |
-| Error handling | Replace try/catch with Pydantic validation | Medium |
-
-**Example Usage:**
-```bash
-# Refactor company service to reduce complexity
-opencode refactor app/api/v1/company/service.py --scope file
+```
+POST /auth/login
+  → Backend returns Company object (no JWT/token)
+  → Frontend stores { companyId, apiKey: "" } in sessionStorage
+  → Redirect to /api to create API key
+  → API key returned once, stored in sessionStorage as { apiKey: "sk_..." }
+  → All subsequent API calls send X-API-Key header
+  → Backend mostly ignores the key (only companySettings verifies it)
 ```
 
-**Relevant Files:**
-- `app/api/v1/company/service.py` — Company CRUD logic
-- `app/api/v1/chat/service.py` — Chat service logic
+**Gaps:**
+- No JWT or server-side sessions
+- No Next.js middleware for route protection
+- Each page does its own `sessionStorage` check (inconsistent)
+- API key in `sessionStorage` is XSS-accessible
+- `/config` uses `localStorage` instead of `sessionStorage` (legacy inconsistency)
+
+### 4.3 State Management
+
+| Layer | Status |
+|-------|--------|
+| `store/index.ts` | ❌ Empty |
+| `features/dashboard/` | ❌ Empty stubs |
+| `features/user/` | ❌ Empty stubs |
+| `features/auth/hooks.ts` | ✅ sessionStorage wrapper |
+| Per-page `useState`/`useEffect` | ✅ Used throughout |
+
+### 4.4 Services
+
+| Service | Status |
+|---------|--------|
+| `auth.service.ts` | ✅ |
+| `company.service.ts` | ✅ |
+| `api-key.service.ts` | ✅ |
+| `chat.service.ts` | ⚠️ `streamChat` incorrectly expects JSON; backend sends SSE |
+| `ticket.service.ts` | ✅ |
+| `companySettings.service.ts` | ✅ |
+| `company/dashboard.ts` | ✅ |
+| `file/uploadProfile.ts` | ✅ (backend upload endpoints broken) |
+| `user.service.ts` | ❌ Types only, no implementation |
 
 ---
 
-### 4.2 Code Test Skill
+## 5. Critical Findings
 
-**Applicable To:** Unit, integration, and API endpoint tests
+### 🔴 Security (Must Fix Before Any Deployment)
 
-| Test Type | Location | Status |
-|-----------|----------|--------|
-| Unit Tests | `tests/unit/` | ⚠️ Not yet created |
-| Integration Tests | `tests/integration/` | ⚠️ Not yet created |
-| API Tests | `tests/api/` | ⚠️ Not yet created |
-| Type Checking | N/A (Python uses Pydantic) | ✅ Handled by Pydantic |
+1. **~90% of endpoints have no authentication** — Anyone can list all companies, delete companies, create API keys, run chat (Groq cost), read all usage data.
+2. **`GET /api/v1/company` exposes all tenant data** — No pagination, no auth.
+3. **API key creation unauthenticated** — Attacker can create keys for any `company_id`.
+4. **Incompatible password hashing** — `auth/service.py` and `company/service.py` use different formats and iteration counts. Passwords may be unverifiable after updates.
+5. **`CORS allow_origins=["*"]` + `allow_credentials=True`** — Browsers reject this; also insecure.
+6. **File upload endpoints crash** — `verify_api_key` returns `int` but `files/route.py` treats it as `dict` → `TypeError` on every upload attempt.
+7. **SHA-256 key hashing, no salt** — Fast to brute-force if DB is leaked.
+8. **No rate limiting** — Login, registration, chat endpoints unlimited.
+9. **Hardcoded absolute filesystem path** in `file_storage.py` — Breaks in any other environment.
+10. **Chat/query has no auth** — Unlimited LLM API usage by anyone with a valid `company_id`.
 
-**Coverage Needed:**
-- Company CRUD endpoints (4 routes)
-- Chat streaming endpoint (1 route)
-- Groq service integration
-- Prompt builder logic
-- RAG file operations
+### 🔴 Database (Must Fix)
 
-**Example Usage:**
-```bash
-# Create unit tests for company service
-opencode test app/api/v1/company/service.py --framework pytest
-```
+11. **Migration `4a625b86562b` drops ticket tables** — Misnamed; contains `DROP TABLE` for `ticket` and `ticket_opened`.
+12. **`company_settings` has no migration** — Only created via `init_db()` `create_all`.
+13. **Ticket migration `886ccfbe74e8` is empty** (`pass`) — Tickets only exist via `create_all`.
+14. **`init_db()` conflicts with Alembic** — Running `create_all` on startup can diverge DB state from migration tracking.
+15. **`alembic/env.py` incomplete model imports** — Autogenerate misses several tables.
 
-**Framework:** pytest (recommended for FastAPI)
+### 🟡 Code Quality
 
----
+16. **`CompanyRead.from_orm()`** — Deprecated in Pydantic v2; use `model_validate`.
+17. **`verify_api_key` Depends pattern broken** — Creates own session when called as a dependency.
+18. **Duplicate registration paths** — `/auth/register` and `POST /api/v1/company`.
+19. **N+1 in dashboard** — Loads all company_requests into memory instead of SQL aggregation.
+20. **Mixed datetime handling** — Some models use `datetime.utcnow` (naive), others `func.now()` (TZ-aware).
+21. **Empty stubs** — `exceptions.py`, `middleware.py`, `constants.py`, `store/index.ts`, `features/dashboard/*`, `features/user/*`.
+22. **`ChatMessage` model has no API routes** — Migration + model + schema exist, no endpoints.
 
-### 4.3 Code Optimize Skill
+### 🟡 Frontend
 
-**Applicable To:** Performance tuning and scalability
-
-| Area | Status | Recommendation |
-|------|--------|-----------------|
-| **Database** | ⚠️ Basic indexing | Add indexes on `company_id`, `company_name`, `company_email` |
-| **Caching** | ❌ Not implemented | Add Redis for company config caching |
-| **Async** | ✅ FastAPI async | All endpoints use `async def` |
-| **Connection Pool** | ✅ SQLAlchemy | Pool size: 5 (default) |
-| **Groq Calls** | ⚠️ Sequential | Consider batch requests for multiple prompts |
-
-**Example Usage:**
-```bash
-# Profile company endpoint performance
-opencode optimize app/api/v1/company/route.py --metric latency
-```
+23. **`/analytics` page empty** — `analyticsTable.tsx` also empty.
+24. **`/config` page broken** — Imports deleted components (`settingsForm`, `promptPreview`).
+25. **Root `/` is a stub** — Doesn't redirect to login or dashboard.
+26. **Chat streaming not wired** — Backend has SSE endpoint; `streamChat` service incorrectly expects JSON.
+27. **Dashboard shows `Invalid Date`** for API keys without an expiry date.
+28. **Inconsistent auth guards** — Ticket list doesn't redirect unauthenticated users.
+29. **No `error.tsx` / `loading.tsx` / `not-found.tsx`** in app routes.
+30. **Widespread `any` types** — Dashboard, profile, chat session state.
 
 ---
 
-### 4.4 Docs Gen Skill
+## 6. Recommendations (Priority Order)
 
-**Applicable To:** API documentation and architecture docs
-
-| Document | Location | Status |
-|----------|----------|--------|
-| API Swagger/OpenAPI | FastAPI auto-gen at `/docs` | ✅ Auto-generated |
-| Architecture | `.agent/project/SKILLS.md` | ✅ Complete |
-| README | `backend/README.md` | ⚠️ Needs creation |
-| Deployment Guide | N/A | ⚠️ Needs creation |
-| Integration Examples | N/A | ⚠️ Needs creation |
-
-**Example Usage:**
-```bash
-# Generate README from project structure
-opencode docs-gen backend --output README.md --template default
-
-# Generate integration examples
-opencode docs-gen app/api/v1 --output INTEGRATION_GUIDE.md
-```
-
----
-
-### 4.5 Project Automation Skill
-
-**Applicable To:** Build, deployment, and CI/CD workflows
-
-| Task | Status | Command |
-|------|--------|---------|
-| **Install Dependencies** | ✅ Done | `pip install -r requirements.txt` |
-| **Type Checking** | ⚠️ Partial | Add `pyright` or `mypy` for Python |
-| **Linting** | ⚠️ Not configured | Add `ruff` or `pylint` |
-| **Testing** | ⚠️ Not configured | `pytest tests/` (needs test suite) |
-| **Database Migration** | ✅ Done | `alembic upgrade head` |
-| **Docker Build** | ⚠️ Not created | Create `Dockerfile` |
-| **Deployment** | ⚠️ Not configured | Create deployment scripts |
-
-**Example Usage:**
-```bash
-# Automate full deployment pipeline
-opencode project-automation setup --env production
-
-# Build Docker image
-opencode project-automation build --target docker --registry supabase
-```
-
-**Recommended Additions:**
-```yaml
-# Add to project for CI/CD
-tools:
-  - ruff (linting)
-  - pyright (type checking)
-  - pytest (testing)
-  - black (formatting)
-  - pre-commit (hooks)
-```
+| # | Action | Priority |
+|---|--------|----------|
+| 1 | Add global auth `Depends` on all `/api/v1/company/*` routes | 🔴 Critical |
+| 2 | Fix `files/route.py` — `verify_api_key` returns `int`, not `dict` | 🔴 Critical |
+| 3 | Unify password hashing — single module, single format | 🔴 Critical |
+| 4 | Fix Alembic migrations — rewrite `4a625b86562b`, add ticket + settings migrations | 🔴 Critical |
+| 5 | Fix CORS — use explicit origin list, not `*` | 🔴 Critical |
+| 6 | Remove or protect `GET /api/v1/company` list endpoint | 🔴 Critical |
+| 7 | Remove `create_all()` from production startup lifespan | 🔴 Critical |
+| 8 | Add JWT/httpOnly cookie sessions after login | 🟡 High |
+| 9 | Add per-key salt to API key hashing | 🟡 High |
+| 10 | Add rate limiting (login, register, chat, API key creation) | 🟡 High |
+| 11 | Make file storage path configurable via env var | 🟡 High |
+| 12 | Fix or delete broken frontend pages (`/config`, `/analytics`, `/`) | 🟡 High |
+| 13 | Wire SSE streaming in frontend chat | 🟡 High |
+| 14 | Add SQL aggregation in dashboard (avoid loading all rows) | 🟢 Medium |
+| 15 | Add Next.js middleware for route protection | 🟢 Medium |
+| 16 | Implement `ChatMessage` API routes or remove the model | 🟢 Medium |
+| 17 | Replace `from_orm()` with `model_validate()` throughout | 🟢 Medium |
+| 18 | Add `error.tsx` / `loading.tsx` to app routes | 🟢 Low |
+| 19 | Write tests (zero coverage currently) | 🟢 Low |
+| 20 | Create Docker setup and CI/CD pipeline | 🟢 Low |
 
 ---
 
-### 4.6 OS Control Skill
+## 7. Phase Checklist
 
-**Applicable To:** System-level operations and environment management
+### Phase 1: Security Hardening (Immediate)
+- [ ] Add `Depends(verify_api_key)` to all company routes
+- [ ] Validate that path `company_id` matches key owner in each route
+- [ ] Fix CORS configuration
+- [ ] Unify password hashing
+- [ ] Fix `files/route.py` type mismatch
+- [ ] Remove `GET /api/v1/company` or add admin auth
+- [ ] Make storage path configurable
 
-| Operation | Status | Notes |
-|-----------|--------|-------|
-| Environment setup | ✅ Manual | Created `.env` file |
-| Process management | ✅ Available | Used for server startup |
-| File operations | ✅ Available | RAG file storage at disk level |
-| Database backup | ⚠️ Not configured | Needs automated backups |
-| Log aggregation | ⚠️ Not configured | Needs centralized logging |
+### Phase 2: Database Integrity
+- [ ] Rewrite `4a625b86562b` migration to create `company_settings` (not drop tickets)
+- [ ] Add proper ticket table migration (`886ccfbe74e8`)
+- [ ] Remove `create_all()` from `init_db()` lifespan
+- [ ] Fix `alembic/env.py` to import all models
+- [ ] Verify migration chain applies cleanly on empty DB
 
-**Example Usage:**
-```bash
-# Setup production environment
-opencode os-control setup --env .env.production
-
-# Backup Supabase database
-opencode os-control backup --db supabase --destination /backups/
-```
-
----
-
-## 5. Implementation Checklist
-
-### Phase 1: Core Infrastructure (✅ COMPLETED)
-
-- [x] PostgreSQL Supabase connection configured
-- [x] Database models created (Company, CompanyFinetune)
-- [x] Alembic migrations applied
-- [x] FastAPI server operational
-- [x] Groq integration configured
-- [x] Prompt engine implemented
-- [x] RAG file storage configured
-
-### Phase 2: API Endpoints (⚠️ IN PROGRESS)
-
-- [x] Company CRUD endpoints implemented
-- [x] Chat streaming endpoint implemented
-- [ ] **TEST company endpoints end-to-end**
-- [ ] **TEST chat streaming end-to-end**
-- [ ] Add error handling & validation
-- [ ] Add request/response logging
-
-### Phase 3: Testing (⚠️ PENDING)
-
-- [ ] Unit tests for company service
-- [ ] Integration tests for API endpoints
-- [ ] Chat streaming integration tests
-- [ ] Groq service mock tests
-- [ ] Achieve 80%+ code coverage
-
-### Phase 4: Documentation (⚠️ PENDING)
-
-- [ ] Generate OpenAPI/Swagger docs
-- [ ] Create API integration guide
-- [ ] Create deployment guide
-- [ ] Create troubleshooting guide
-
-### Phase 5: Deployment (⚠️ PENDING)
-
-- [ ] Create Dockerfile
-- [ ] Create docker-compose.yml
-- [ ] Setup GitHub Actions CI/CD
-- [ ] Deploy to production
-
-### Phase 6: Security & Compliance (⚠️ PENDING)
-
-- [ ] Add JWT authentication
+### Phase 3: Auth & Sessions
+- [ ] Implement JWT or signed sessions returned at login
+- [ ] Add Next.js middleware for route protection
+- [ ] Replace `sessionStorage` with httpOnly cookie auth
 - [ ] Add rate limiting
-- [ ] Add CORS configuration
-- [ ] Setup audit logging
-- [ ] Conduct security review
+
+### Phase 4: Frontend Fixes
+- [ ] Fix or delete `/config` page (broken imports)
+- [ ] Implement `/analytics` page
+- [ ] Wire root `/` → `/login` redirect
+- [ ] Wire SSE streaming in chat
+- [ ] Fix `Invalid Date` on API key expiry display
+- [ ] Add consistent auth guards across all pages
+- [ ] Add `error.tsx` / `loading.tsx` to routes
+
+### Phase 5: API Completeness
+- [ ] Add `ChatMessage` API routes or remove model
+- [ ] Implement `user.service.ts` logic
+- [ ] Replace `from_orm()` with `model_validate()`
+- [ ] Fix mixed datetime handling
+
+### Phase 6: Quality & Deployment
+- [ ] Write test suite (unit + integration)
+- [ ] Add structured logging
+- [ ] Create Dockerfile + docker-compose
+- [ ] Setup CI/CD
 
 ---
 
-## 6. Critical Findings & Recommendations
+## 8. Tech Stack Reference
 
-### 🔴 High Priority
-
-1. **API Endpoint Testing** — None of the endpoints have been tested with real requests
-   - **Action:** Use skill `code-test` to create integration tests
-   - **Timeline:** Before any production deployment
-
-2. **Missing Authentication** — No JWT or API key validation implemented
-   - **Action:** Add authentication middleware
-   - **Timeline:** ASAP, before exposing endpoints
-
-3. **No Error Handling** — Limited error responses and logging
-   - **Action:** Add comprehensive error handling with proper HTTP status codes
-   - **Timeline:** Before first deployment
-
-### 🟡 Medium Priority
-
-1. **Database Indexing** — No indexes on frequently queried columns
-   - **Action:** Create migration with indexes on `company_id`, `company_email`
-   - **Timeline:** Before scaling
-
-2. **Caching** — No caching layer for company data
-   - **Action:** Add Redis caching using `code-optimize` skill
-   - **Timeline:** For production optimization
-
-3. **Logging** — Limited structured logging
-   - **Action:** Add Python logging with JSON formatters
-   - **Timeline:** Before production
-
-### 🟢 Low Priority
-
-1. **Documentation** — Missing deployment and integration guides
-   - **Action:** Use `docs-gen` skill to generate
-   - **Timeline:** For developer experience
-
-2. **Docker** — Container setup not configured
-   - **Action:** Create Dockerfile and docker-compose
-   - **Timeline:** For easier deployment
+| Layer | Technology |
+|-------|-----------|
+| Backend | FastAPI, SQLAlchemy 2.x, Alembic, Pydantic 2, Groq SDK |
+| Database | PostgreSQL 17.6 (Supabase) |
+| LLM | Groq `llama-3.3-70b-versatile`, streaming SSE |
+| RAG | BM25 retrieval, disk-based markdown |
+| Auth | Custom SHA-256 API keys (no JWT currently) |
+| Frontend | Next.js 16, React 19, Tailwind 4, shadcn/Radix |
+| State | sessionStorage (no global store) |
+| File Storage | Local filesystem (hardcoded path) |
 
 ---
 
-## 7. Next Steps
-
-### Immediate (Next Session)
-
-```bash
-# 1. Test company CRUD endpoints
-curl -X POST http://localhost:8000/api/v1/company \
-  -H "Content-Type: application/json" \
-  -d '{"company_name":"Test Co","company_email":"test@example.com","password":"secret123"}'
-
-# 2. Test chat streaming
-curl -X POST http://localhost:8000/api/v1/company/1/chat/stream \
-  -H "Content-Type: application/json" \
-  -d '{"message":"Hello"}'
-
-# 3. Create test suite
-opencode code-test create --framework pytest --path tests/
-```
-
-### Short Term (This Week)
-
-1. Add authentication middleware (JWT)
-2. Add input validation and error handling
-3. Create integration test suite
-4. Add structured logging
-
-### Medium Term (This Month)
-
-1. Add caching layer (Redis)
-2. Create deployment documentation
-3. Setup Docker containers
-4. Configure CI/CD pipeline
-
-### Long Term (Roadmap)
-
-1. Add chat history storage (Conversation, Message models)
-2. Add analytics tracking
-3. Add rate limiting
-4. Add webhooks
-
----
-
-## 8. Skills Usage Summary
-
-| Skill | Use Cases | Frequency |
-|-------|-----------|-----------|
-| **code-refactor** | Simplify service logic, optimize imports | As needed |
-| **code-test** | Write tests, verify coverage, CI/CD | Continuous |
-| **code-optimize** | Performance tuning, caching, DB optimization | Quarterly |
-| **docs-gen** | API docs, integration guides, README | Per release |
-| **project-automation** | Build, deploy, release automation | Per deployment |
-| **os-control** | Environment setup, backups, monitoring | Operational |
-
----
-
-## 9. Verification Commands
-
-```bash
-# Verify database connection
-python3 -c "from app.core.config.config import DATABASE_URL; print(f'✓ DB: {DATABASE_URL[:50]}...')"
-
-# Verify Alembic migrations
-alembic current
-
-# Verify server startup
-cd backend && timeout 5 python3 -m uvicorn app.main:app --host 127.0.0.1 --port 8000 || true
-
-# List all tables
-python3 << 'EOF'
-from app.core.config.config import DATABASE_URL
-from sqlalchemy import create_engine, inspect
-engine = create_engine(DATABASE_URL)
-print("Tables:", inspect(engine).get_table_names())
-EOF
-```
-
----
-
-## 10. Conclusion
-
-The Perai backend infrastructure is **production-ready** with:
-
-✅ PostgreSQL Supabase database operational  
-✅ Alembic migrations applied  
-✅ FastAPI server functional  
-✅ Groq LLM integration configured  
-✅ RAG file storage implemented  
-
-**Next Critical Steps:**
-1. End-to-end testing of all API endpoints
-2. Implementation of authentication
-3. Comprehensive error handling
-4. Full test suite creation
-
-**Skills Ready to Deploy:**
-- `code-test` — For test suite creation
-- `code-refactor` — For code quality
-- `project-automation` — For CI/CD setup
-- `docs-gen` — For documentation
-
----
-
-**Prepared by:** OpenCode Agent  
-**Date:** May 22, 2026  
-**Status:** Ready for Production Deployment
+**Audited by:** Cursor Agent
+**Date:** June 12, 2026
+**Previous Audit:** May 22, 2026 (outdated — overstated readiness)

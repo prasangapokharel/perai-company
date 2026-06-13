@@ -6,7 +6,12 @@ from sqlalchemy.exc import IntegrityError
 
 from app.models.company import APIKey, APIKeyStatus, Company
 from app.schemas.companySchema import APIKeyCreate, APIKeyUpdate, APIKeyCreateResponse, APIKeyRead
-from app.core.api_key_utils import generate_api_key, hash_api_key, get_key_preview, is_api_key_expired
+from app.utils.api_key import (
+    generate_api_key,
+    hash_api_key,
+    get_key_preview,
+    is_api_key_expired,
+)
 
 
 def create_api_key(db: Session, company_id: int, payload: APIKeyCreate) -> tuple[APIKey, str]:
@@ -91,10 +96,14 @@ def get_api_key(db: Session, company_id: int, key_id: int) -> APIKey:
     Raises:
         ValueError: If key not found or doesn't belong to company
     """
-    api_key = db.query(APIKey).filter(
-        APIKey.id == key_id,
-        APIKey.company_id == company_id,
-    ).first()
+    api_key = (
+        db.query(APIKey)
+        .filter(
+            APIKey.id == key_id,
+            APIKey.company_id == company_id,
+        )
+        .first()
+    )
 
     if not api_key:
         raise ValueError(f"API key with ID {key_id} not found for company {company_id}")
@@ -193,7 +202,7 @@ def validate_api_key(db: Session, api_key: str) -> tuple[APIKey, bool]:
     Raises:
         ValueError: If key is invalid
     """
-    from app.core.api_key_utils import hash_api_key, is_api_key_expired
+    from app.utils.api_key import hash_api_key, is_api_key_expired
 
     key_hash = hash_api_key(api_key)
     db_key = db.query(APIKey).filter(APIKey.key_hash == key_hash).first()

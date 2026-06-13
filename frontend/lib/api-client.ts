@@ -1,3 +1,6 @@
+import type { ApiAuth } from "@/lib/api-auth"
+import { buildAuthHeaders } from "@/lib/api-auth"
+
 export const API_BASE_URL = process.env.API_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000/api/v1"
 
 export class APIError extends Error {
@@ -11,13 +14,22 @@ export class APIError extends Error {
   }
 }
 
-export async function apiClient<T>(path: string, init: RequestInit = {}, apiKey?: string) {
+function resolveAuthHeaders(auth?: ApiAuth | string): Record<string, string> {
+  if (!auth) return {}
+  if (typeof auth === "string") return auth ? { "X-API-Key": auth } : {}
+  if (auth.accessToken) return { Authorization: `Bearer ${auth.accessToken}` }
+  if (auth.apiKey) return { "X-API-Key": auth.apiKey }
+  return {}
+}
+
+export async function apiClient<T>(path: string, init: RequestInit = {}, auth?: ApiAuth | string) {
+  const isForm = init.body instanceof FormData
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...init,
     headers: {
-      "Content-Type": "application/json",
-      ...(apiKey ? { "X-API-Key": apiKey } : {}),
-      ...init.headers,
+      ...(isForm ? {} : { "Content-Type": "application/json" }),
+      ...resolveAuthHeaders(auth),
+      ...(init.headers as Record<string, string> | undefined),
     },
   })
 
@@ -27,11 +39,14 @@ export async function apiClient<T>(path: string, init: RequestInit = {}, apiKey?
       const body = await response.json()
       detail = body.detail || JSON.stringify(body)
     } catch {
-      // Response is not JSON, use status text
       detail = response.statusText || detail
     }
     throw new APIError(response.status, detail)
   }
 
-  return response.json() as Promise<T>
+  if (response.status === 204) return undefined as T
+
+  const text = await response.text()
+  if (!text) return undefined as T
+  return JSON.parse(text) as T
 }

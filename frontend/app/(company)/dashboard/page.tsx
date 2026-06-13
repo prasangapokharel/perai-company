@@ -11,16 +11,14 @@ import {
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { loadAuthSession } from "@/features/auth/hooks"
-import { getCompany } from "@/services/company.service"
-import { listAPIKeys } from "@/services/api-key.service"
+import { loadAuthSession, sessionAuth } from "@/features/auth/hooks"
+import { getCompanyDashboard } from "@/services/company/dashboard"
 import { APIError } from "@/lib/api-client"
-import { Key, MessageSquare, Zap, Activity } from "lucide-react"
+import { Key, Zap, BarChart3, Clock, DollarSign } from "lucide-react"
 
 export default function DashboardPage() {
   const router = useRouter()
-  const [company, setCompany] = useState<any>(null)
-  const [apiKeys, setApiKeys] = useState<any[]>([])
+  const [dashboard, setDashboard] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [session, setSession] = useState<any>(null)
@@ -35,13 +33,9 @@ export default function DashboardPage() {
         }
         setSession(sess)
 
-        const [companyData, keys] = await Promise.all([
-          getCompany(sess.companyId, sess.apiKey),
-          listAPIKeys(sess.companyId, sess.apiKey),
-        ])
+        const dashboardData = await getCompanyDashboard(sess.companyId, sessionAuth(sess))
 
-        setCompany(companyData)
-        setApiKeys(keys)
+        setDashboard(dashboardData)
       } catch (err) {
         if (err instanceof APIError) {
           setError(`Error: ${err.detail}`)
@@ -66,22 +60,28 @@ export default function DashboardPage() {
     )
   }
 
-  if (!company) {
+  if (!dashboard && error) {
     return (
       <div className="flex items-center justify-center h-96">
-        <p className="text-muted-foreground">No company data found</p>
+        <p className="text-destructive">{error}</p>
       </div>
     )
   }
 
-  const activeKeys = apiKeys.filter((k) => k.status === "active").length
+  if (!dashboard) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <p className="text-muted-foreground">No dashboard data found</p>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground">
-          Welcome back, {company.company_name}
+          Welcome back, {dashboard.company_name}
         </p>
       </div>
 
@@ -91,132 +91,193 @@ export default function DashboardPage() {
         </Alert>
       )}
 
-      {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-4">
+      {/* Top Stats */}
+      <div className="grid gap-4 md:grid-cols-5">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">API Keys</CardTitle>
             <Key className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{apiKeys.length}</div>
+            <div className="text-2xl font-bold">{dashboard.total_api_keys}</div>
             <p className="text-xs text-muted-foreground">
-              {activeKeys} active
+              {dashboard.active_api_keys} active
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Finetune Status</CardTitle>
-            <Zap className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Total Tokens</CardTitle>
+            <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {company.company_model_name ? "Active" : "Inactive"}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {company.company_model_name || "Not configured"}
-            </p>
+            <div className="text-2xl font-bold">{dashboard.total_tokens_all_time.toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground">All time tokens consumed</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Model Name</CardTitle>
-            <Badge variant="secondary">Model</Badge>
+            <CardTitle className="text-sm font-medium">Credit Balance</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{dashboard.current_balance ?? "0"}</div>
+            <p className="text-xs text-muted-foreground">Available credits for chat</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Spent</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{dashboard.total_balance_deducted_all_time}</div>
+            <p className="text-xs text-muted-foreground">All time balance deducted</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Last Request</CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-sm font-semibold truncate">
-              {company.company_model_name || "Not configured"}
+              {dashboard.last_request_at
+                ? new Date(dashboard.last_request_at).toLocaleString()
+                : "No requests yet"}
             </div>
-            <p className="text-xs text-muted-foreground">Current company model</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Email</CardTitle>
-            <MessageSquare className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-sm font-semibold truncate">{company.company_email}</div>
-            <p className="text-xs text-muted-foreground">
-              Company email
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Status</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">Active</div>
-            <p className="text-xs text-muted-foreground">
-              Account active
-            </p>
+            <p className="text-xs text-muted-foreground">Last API call timestamp</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Company Info */}
+      {/* Finetune Model */}
       <Card>
         <CardHeader>
-          <CardTitle>Company Information</CardTitle>
-          <CardDescription>Your company details</CardDescription>
+          <CardTitle>Model Status</CardTitle>
+          <CardDescription>Your fine-tuned model</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
+        <CardContent>
+          <div className="flex items-center gap-2">
+            <Badge variant={dashboard.model_name ? "default" : "secondary"}>
+              {dashboard.model_name ? "Active" : "Inactive"}
+            </Badge>
+            <span className="text-sm text-muted-foreground">
+              {dashboard.model_name || "No model configured"}
+            </span>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Usage Metrics */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm font-medium">Today</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="flex justify-between">
+              <span className="text-sm text-muted-foreground">Requests</span>
+              <span className="font-semibold">{dashboard.usage_metrics.today.total_requests}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-muted-foreground">Tokens</span>
+              <span className="font-semibold">{dashboard.usage_metrics.today.total_tokens_consumed}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-muted-foreground">Balance</span>
+              <span className="font-semibold">{dashboard.usage_metrics.today.total_balance_deducted}</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm font-medium">This Week</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="flex justify-between">
+              <span className="text-sm text-muted-foreground">Requests</span>
+              <span className="font-semibold">{dashboard.usage_metrics.weekly.total_requests}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-muted-foreground">Tokens</span>
+              <span className="font-semibold">{dashboard.usage_metrics.weekly.total_tokens_consumed}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-muted-foreground">Balance</span>
+              <span className="font-semibold">{dashboard.usage_metrics.weekly.total_balance_deducted}</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm font-medium">This Month</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="flex justify-between">
+              <span className="text-sm text-muted-foreground">Requests</span>
+              <span className="font-semibold">{dashboard.usage_metrics.monthly.total_requests}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-muted-foreground">Tokens</span>
+              <span className="font-semibold">{dashboard.usage_metrics.monthly.total_tokens_consumed}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-muted-foreground">Balance</span>
+              <span className="font-semibold">{dashboard.usage_metrics.monthly.total_balance_deducted}</span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Credit Deducted */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Credit Deducted</CardTitle>
+          <CardDescription>Balance deducted per period</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-3">
             <div>
-              <p className="text-sm text-muted-foreground">Company Name</p>
-              <p className="font-semibold">{company.company_name}</p>
+              <p className="text-sm text-muted-foreground">Today</p>
+              <p className="text-xl font-bold">{dashboard.credit_deducted.today}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Email</p>
-              <p className="font-semibold">{company.company_email}</p>
+              <p className="text-sm text-muted-foreground">This Week</p>
+              <p className="text-xl font-bold">{dashboard.credit_deducted.weekly}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Website</p>
-              <p className="font-semibold">{company.website || "Not set"}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Model Name</p>
-              <p className="font-semibold">
-                {company.company_model_name || "Not configured"}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Created</p>
-              <p className="font-semibold">
-                {new Date(company.created_at).toLocaleDateString()}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Last Updated</p>
-              <p className="font-semibold">
-                {new Date(company.updated_at).toLocaleDateString()}
-              </p>
+              <p className="text-sm text-muted-foreground">This Month</p>
+              <p className="text-xl font-bold">{dashboard.credit_deducted.monthly}</p>
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* API Keys Summary */}
-      {apiKeys.length > 0 && (
+      {dashboard.api_keys.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>API Keys Summary</CardTitle>
-            <CardDescription>Your active API keys</CardDescription>
+            <CardDescription>Your registered API keys</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              {apiKeys.slice(0, 5).map((key) => (
-                <div key={key.id} className="flex items-center justify-between p-2 border rounded">
-                  <div>
+            <div className="space-y-3">
+              {dashboard.api_keys.slice(0, 10).map((key: any) => (
+                <div key={key.id} className="flex items-center justify-between p-3 border rounded">
+                  <div className="space-y-1">
                     <p className="font-medium text-sm">{key.name}</p>
                     <p className="text-xs text-muted-foreground">{key.key_preview}</p>
+                    <div className="flex gap-3 text-xs text-muted-foreground">
+                      <span>Created: {new Date(key.created_at).toLocaleDateString()}</span>
+                      <span>Expires: {new Date(key.expiry_date).toLocaleDateString()}</span>
+                    </div>
                   </div>
                   <Badge
                     variant={
@@ -231,9 +292,9 @@ export default function DashboardPage() {
                   </Badge>
                 </div>
               ))}
-              {apiKeys.length > 5 && (
+              {dashboard.api_keys.length > 10 && (
                 <p className="text-xs text-muted-foreground pt-2">
-                  +{apiKeys.length - 5} more keys
+                  +{dashboard.api_keys.length - 10} more keys
                 </p>
               )}
             </div>

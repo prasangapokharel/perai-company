@@ -1,3 +1,4 @@
+import type { ApiAuth } from "@/lib/api-auth"
 import { apiClient } from "@/lib/api-client"
 
 export type Ticket = {
@@ -46,38 +47,38 @@ export type TicketStats = {
   by_category: Record<Ticket["category"], number>
 }
 
-export function createTicket(companyId: number, payload: TicketCreateInput, apiKey?: string) {
-  return apiClient<Ticket>(`/company/${companyId}/tickets`, { method: "POST", body: JSON.stringify(payload) }, apiKey)
+export function createTicket(companyId: number, payload: TicketCreateInput, auth?: ApiAuth | string) {
+  return apiClient<Ticket>(`/company/${companyId}/tickets`, { method: "POST", body: JSON.stringify(payload) }, auth)
 }
 
 export function listTickets(
   companyId: number,
   filters: { status_filter?: Ticket["status"]; category_filter?: Ticket["category"] } = {},
-  apiKey?: string,
+  auth?: ApiAuth | string,
 ) {
   const params = new URLSearchParams()
   if (filters.status_filter) params.set("status_filter", filters.status_filter)
   if (filters.category_filter) params.set("category_filter", filters.category_filter)
   const query = params.toString() ? `?${params.toString()}` : ""
-  return apiClient<Ticket[]>(`/company/${companyId}/tickets${query}`, {}, apiKey)
+  return apiClient<Ticket[]>(`/company/${companyId}/tickets${query}`, {}, auth)
 }
 
-export function getTicket(companyId: number, ticketId: number, apiKey?: string) {
-  return apiClient<Ticket>(`/company/${companyId}/tickets/${ticketId}`, {}, apiKey)
+export function getTicket(companyId: number, ticketId: number, auth?: ApiAuth | string) {
+  return apiClient<Ticket>(`/company/${companyId}/tickets/${ticketId}`, {}, auth)
 }
 
-export function updateTicket(companyId: number, ticketId: number, payload: TicketUpdateInput, apiKey?: string) {
-  return apiClient<Ticket>(`/company/${companyId}/tickets/${ticketId}`, { method: "PUT", body: JSON.stringify(payload) }, apiKey)
+export function updateTicket(companyId: number, ticketId: number, payload: TicketUpdateInput, auth?: ApiAuth | string) {
+  return apiClient<Ticket>(`/company/${companyId}/tickets/${ticketId}`, { method: "PUT", body: JSON.stringify(payload) }, auth)
 }
 
-export function deleteTicket(companyId: number, ticketId: number, apiKey?: string) {
-  return apiClient<void>(`/company/${companyId}/tickets/${ticketId}`, { method: "DELETE" }, apiKey)
+export function deleteTicket(companyId: number, ticketId: number, auth?: ApiAuth | string) {
+  return apiClient<void>(`/company/${companyId}/tickets/${ticketId}`, { method: "DELETE" }, auth)
 }
 
-export function getTicketHistory(companyId: number, ticketId: number, apiKey?: string) {
-  return apiClient<TicketHistory>(`/company/${companyId}/tickets/${ticketId}/history`, {}, apiKey)
+export function getTicketHistory(companyId: number, ticketId: number, auth?: ApiAuth | string) {
+  return apiClient<TicketHistory>(`/company/${companyId}/tickets/${ticketId}/history`, {}, auth)
 }
 
-export function getTicketStats(companyId: number, apiKey?: string) {
-  return apiClient<TicketStats>(`/company/${companyId}/tickets-stats`, {}, apiKey)
+export function getTicketStats(companyId: number, auth?: ApiAuth | string) {
+  return apiClient<TicketStats>(`/company/${companyId}/tickets-stats`, {}, auth)
 }

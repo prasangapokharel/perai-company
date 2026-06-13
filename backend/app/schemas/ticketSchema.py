@@ -7,6 +7,7 @@ from typing import Optional
 
 class TicketCreate(BaseModel):
     """Create ticket request."""
+
     issue: str
     category: str = "general"  # payment, technical, general
 
@@ -16,6 +17,7 @@ class TicketCreate(BaseModel):
 
 class TicketUpdate(BaseModel):
     """Update ticket request."""
+
     issue: Optional[str] = None
     category: Optional[str] = None
     status: Optional[str] = None  # open, closed
@@ -26,6 +28,7 @@ class TicketUpdate(BaseModel):
 
 class TicketOpenedCreate(BaseModel):
     """Create ticket opened record."""
+
     ticket_id: int
     opened_at: datetime
     closed_at: Optional[datetime] = None
@@ -36,6 +39,7 @@ class TicketOpenedCreate(BaseModel):
 
 class TicketOpenedRead(BaseModel):
     """Read ticket opened record."""
+
     id: int
     company_id: int
     ticket_id: int
@@ -50,6 +54,7 @@ class TicketOpenedRead(BaseModel):
 
 class TicketRead(BaseModel):
     """Read ticket response."""
+
     id: int
     company_id: int
     issue: str
@@ -65,6 +70,7 @@ class TicketRead(BaseModel):
 
 class TicketWithDetails(BaseModel):
     """Ticket with all details."""
+
     id: int
     company_id: int
     issue: str

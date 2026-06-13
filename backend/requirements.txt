@@ -1,10 +1,38 @@
-# Backend dependencies
-supabase
+# Core
 fastapi
 uvicorn[standard]
+python-multipart
+
+# Database
 sqlalchemy>=2.0
-groq
 alembic
-python-dotenv
 psycopg2-binary
+pgvector
+
+# Auth
+python-jose[cryptography]
+passlib[bcrypt]
+
+# Rate limiting
+slowapi
+
+# AI
+groq
+
+# Embeddings (lightweight ONNX-based, no PyTorch)
+fastembed
+
+# Supabase
+supabase
+
+# Config
+python-dotenv
+
+# Validation
 pydantic>=2.0
+email-validator
+
+# Testing
+pytest
+pytest-asyncio
+httpx
