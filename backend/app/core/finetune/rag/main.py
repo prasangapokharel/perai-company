@@ -8,6 +8,11 @@ import unicodedata
 from hashlib import sha1
 from pathlib import Path
 from typing import Any
+from app.core.config.config import (
+    RAG_MAX_CONTEXT_CHARS,
+    RAG_RECORD_MAX_CHARS,
+    RAG_TOP_K,
+)
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -24,14 +29,25 @@ _TRAINING_FILENAME = "herethefile.md"
 _TRAINING_FILENAME_NEW = "company.md"
 
 # Chunk settings
-_CHUNK_SIZE = 400  # characters per chunk
-_CHUNK_OVERLAP = 80  # overlap between consecutive chunks
-_TOP_K = 6  # maximum chunks to return
-_MIN_SCORE = 0.05  # discard chunks below this BM25-like score
-_TREE_MIN_SCORE = 0.08
+_CHUNK_SIZE = 400
+_CHUNK_OVERLAP = 80
+_TOP_K = RAG_TOP_K
+_MIN_SCORE = 0.08
+_TREE_MIN_SCORE = 0.12
 _MAX_TREE_NODES = 1200
 _MAX_NODE_TEXT = 1600
 _MIN_MATCHED_NODES = 1
+_MIN_RECORD_SCORE = 2.5
+
+_QUERY_STOPWORDS = frozenset({
+    "who", "is", "are", "was", "were", "the", "a", "an", "what", "where", "when",
+    "how", "why", "show", "find", "get", "me", "tell", "about", "please", "can",
+    "you", "do", "does", "did", "have", "has", "for", "of", "at", "in", "on", "to",
+})
+
+_LIST_QUERY_HINTS = frozenset({
+    "staff", "employees", "employee", "team", "list", "members", "people", "key",
+})
 
 
 _company_tree_cache: dict[int, tuple[int, list[dict[str, Any]], str]] = {}
@@ -194,6 +210,23 @@ def save_training_file_for_company(company_id: int, content: str) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
 
     path.write_text(content.strip(), encoding="utf-8")
+    _company_tree_cache.pop(company_id, None)
+    return path
+
+
+def append_training_file_for_company(company_id: int, content: str) -> Path:
+    path = get_training_file_path_for_company(company_id)
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    incoming = content.strip()
+    if path.exists():
+        existing = path.read_text(encoding="utf-8").rstrip()
+        merged = f"{existing}\n\n---\n\n{incoming}" if existing else incoming
+    else:
+        merged = incoming
+
+    path.write_text(merged, encoding="utf-8")
+    _company_tree_cache.pop(company_id, None)
     return path
 
 
@@ -209,9 +242,8 @@ def _retrieve_from_text(
     full_text: str,
     query: str,
     top_k: int = _TOP_K,
-    fallback_chars: int = 3000,
+    fallback_chars: int = RAG_MAX_CONTEXT_CHARS,
 ) -> tuple[str, bool]:
-    """Retrieve the most relevant chunks from a full text blob."""
     if not full_text:
         return ("", False)
 
@@ -226,12 +258,11 @@ def _retrieve_from_text(
 
     chunks = _chunk_text(full_text)
     if not chunks:
-        return (full_text[:fallback_chars], False)
+        return ("", False)
 
     query_tokens = _tokenize(query)
     if not query_tokens:
-        selected = chunks[:top_k]
-        return ("\n\n---\n\n".join(selected), True)
+        return ("", False)
 
     avg_dl = sum(len(_tokenize(c)) for c in chunks) / len(chunks)
     corpus_size = len(chunks)
@@ -242,9 +273,8 @@ def _retrieve_from_text(
     scored.sort(key=lambda x: x[0], reverse=True)
 
     selected = [c for score, c in scored if score >= _MIN_SCORE][:top_k]
-
     if not selected:
-        selected = [scored[0][1]] if scored else chunks[:1]
+        return ("", False)
 
     return ("\n\n---\n\n".join(selected), True)
 
@@ -255,6 +285,240 @@ def _first_nonempty_line(text: str) -> str:
         if line:
             return line
     return ""
+
+
+def _extract_search_literals(query: str) -> list[str]:
+    text = (query or "").strip()
+    if not text:
+        return []
+
+    literals: list[str] = []
+    seen: set[str] = set()
+
+    def _add(value: str) -> None:
+        cleaned = value.strip()
+        if len(cleaned) < 3:
+            return
+        key = cleaned.lower()
+        if key in seen:
+            return
+        seen.add(key)
+        literals.append(cleaned)
+
+    for match in re.finditer(r"\d{3,}", text):
+        _add(match.group())
+    for match in re.finditer(r'"([^"]{3,})"|\'([^\']{3,})\'', text):
+        _add(match.group(1) or match.group(2) or "")
+    for token in _tokenize(text):
+        if token.isdigit() and len(token) >= 3:
+            _add(token)
+        elif len(token) >= 5:
+            _add(token)
+    return literals
+
+
+def _find_literal_record_indices(records: list[str], literals: list[str], top_k: int) -> list[int]:
+    if not records or not literals:
+        return []
+
+    ranked: list[tuple[int, int]] = []
+    for idx, record in enumerate(records):
+        record_lower = record.lower()
+        weight = 0
+        for lit in literals:
+            lit_lower = lit.lower()
+            if lit_lower not in record_lower:
+                continue
+            hit_weight = 4 if lit.isdigit() else 1
+            if len(lit) >= 6:
+                hit_weight += 1
+            weight = max(weight, hit_weight)
+        if weight:
+            ranked.append((weight, idx))
+
+    ranked.sort(key=lambda item: item[0], reverse=True)
+    return [idx for _, idx in ranked[:top_k]]
+
+
+def _format_records_context(
+    records: list[str],
+    indices: list[int],
+    max_chars: int,
+    record_max_chars: int,
+) -> str:
+    blocks: list[str] = []
+    total = 0
+    for idx in indices:
+        text = records[idx].strip()
+        lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
+        if not lines:
+            continue
+        title = lines[0][:80]
+        body_lines = lines[1:] if len(lines) > 1 else lines
+        body = "\n".join(body_lines)
+        if len(body) > record_max_chars:
+            body = body[:record_max_chars].rstrip()
+        block = f"[{title}]\n{body}"
+        if total + len(block) > max_chars:
+            break
+        blocks.append(block)
+        total += len(block)
+    return "\n\n---\n\n".join(blocks).strip()
+
+
+def _analyze_query(query: str) -> dict[str, list[str]]:
+    text = (query or "").strip()
+    lower = text.lower()
+    tokens = _tokenize(lower)
+    keywords = [t for t in tokens if t not in _QUERY_STOPWORDS and len(t) >= 3]
+
+    ids: list[str] = []
+    for match in re.finditer(r"\b[A-Za-z]{2,}-\d{3,}\b", text):
+        ids.append(match.group(0))
+    for match in re.finditer(r"#(\d{3,})", text):
+        ids.append(match.group(1))
+
+    numbers: list[str] = []
+    for match in re.finditer(r"\d{3,}", text):
+        numbers.append(match.group(0))
+
+    emails: list[str] = []
+    for match in re.finditer(r"[\w.+-]+@[\w-]+\.[\w.-]+", text, re.I):
+        emails.append(match.group(0))
+
+    name_phrases: list[str] = []
+    for match in re.finditer(r"\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)\b", text):
+        name_phrases.append(match.group(1).lower())
+
+    content_tokens = [t for t in tokens if t not in _QUERY_STOPWORDS and len(t) >= 2]
+    for size in (3, 2):
+        for i in range(len(content_tokens) - size + 1):
+            phrase = " ".join(content_tokens[i : i + size])
+            if phrase not in name_phrases:
+                name_phrases.append(phrase)
+
+    _, _, bigrams = _query_features(lower)
+    return {
+        "ids": list(dict.fromkeys(ids)),
+        "numbers": list(dict.fromkeys(numbers)),
+        "emails": list(dict.fromkeys(emails)),
+        "name_phrases": list(dict.fromkeys(name_phrases)),
+        "keywords": list(dict.fromkeys(keywords)),
+        "bigrams": bigrams,
+    }
+
+
+def _is_list_query(analysis: dict[str, list[str]]) -> bool:
+    return bool(set(analysis["keywords"]) & _LIST_QUERY_HINTS)
+
+
+def _score_record_match(record: str, analysis: dict[str, list[str]], query_lower: str) -> float:
+    record_lower = record.lower()
+    score = 0.0
+
+    for id_val in analysis["ids"]:
+        if id_val.lower() in record_lower:
+            score += 12.0
+
+    for num in analysis["numbers"]:
+        if num in record_lower:
+            score += 9.0
+
+    for email in analysis["emails"]:
+        if email.lower() in record_lower:
+            score += 12.0
+
+    for name in sorted(analysis["name_phrases"], key=len, reverse=True):
+        if name in record_lower:
+            score += 8.0 + max(len(name.split()) - 1, 0) * 3.0
+            break
+
+    keywords = analysis["keywords"]
+    if keywords:
+        hits = sum(1 for kw in keywords if kw in record_lower)
+        score += (hits / len(keywords)) * 4.0
+        if hits == len(keywords) and len(keywords) >= 2:
+            score += 3.0
+
+    for bigram in analysis["bigrams"]:
+        if bigram in record_lower:
+            score += 1.5
+
+    if len(query_lower) >= 10 and query_lower in record_lower:
+        score += 10.0
+
+    if _is_list_query(analysis):
+        if "list of" in record_lower or "here is a list" in record_lower:
+            score += 7.0
+        if "employee id" in record_lower:
+            score += 1.0
+
+    return score
+
+
+def _expand_staff_list_indices(
+    records: list[str],
+    ranked: list[tuple[float, int]],
+    top_k: int,
+) -> list[int]:
+    selected: list[int] = []
+    seen: set[int] = set()
+
+    for _, idx in ranked:
+        if idx in seen:
+            continue
+        selected.append(idx)
+        seen.add(idx)
+        if len(selected) >= top_k:
+            return selected
+
+    for idx, record in enumerate(records):
+        if idx in seen:
+            continue
+        if "employee id" in record.lower():
+            selected.append(idx)
+            seen.add(idx)
+        if len(selected) >= top_k:
+            break
+    return selected
+
+
+def _retrieve_record_matches(
+    records: list[str],
+    query: str,
+    top_k: int,
+    max_chars: int,
+) -> tuple[str, bool]:
+    if not records:
+        return ("", False)
+
+    analysis = _analyze_query(query)
+    has_signal = any(
+        analysis[key]
+        for key in ("ids", "numbers", "emails", "name_phrases", "keywords")
+    )
+    if not has_signal:
+        return ("", False)
+
+    query_lower = query.strip().lower()
+    ranked = [
+        (_score_record_match(record, analysis, query_lower), idx)
+        for idx, record in enumerate(records)
+    ]
+    ranked = [(score, idx) for score, idx in ranked if score >= _MIN_RECORD_SCORE]
+    ranked.sort(key=lambda item: item[0], reverse=True)
+    if not ranked:
+        return ("", False)
+
+    if _is_list_query(analysis):
+        indices = _expand_staff_list_indices(records, ranked, top_k)
+    else:
+        indices = [idx for _, idx in ranked[:top_k]]
+
+    context = _format_records_context(records, indices, max_chars, RAG_RECORD_MAX_CHARS)
+    if not context:
+        return ("", False)
+    return (context, True)
 
 
 def _split_tree_records(full_text: str) -> list[str]:
@@ -417,10 +681,10 @@ def _score_tree_node(
         bigram_bonus = min(hit / max(len(query_bigrams), 1), 1.0) * 0.2
 
     exact_numeric_bonus = 0.0
-    numeric_like = [t for t in query_tokens if any(ch.isdigit() for ch in t)]
-    if numeric_like:
-        matches = sum(1 for t in numeric_like if t in content or t in title)
-        exact_numeric_bonus = min(matches * 0.08, 0.24)
+    for lit in _extract_search_literals(query_text):
+        if lit in content or lit in title:
+            exact_numeric_bonus += 2.5 if lit.isdigit() else 0.4
+    exact_numeric_bonus = min(exact_numeric_bonus, 3.0)
 
     vector_bonus = _cosine_similarity(query_vector, node_vector)
 
@@ -465,13 +729,6 @@ def _expand_tree_hits(
 
         record_index = int(item.get("record_index", -1) or -1)
         if record_index >= 0:
-            for near in (record_index - 1, record_index + 1):
-                if near < 0:
-                    continue
-                near_nodes = by_record.get(near, [])
-                for near_node in near_nodes[:1]:
-                    _add(str(near_node.get("id", "")), max(base_score - 0.12, 0.0))
-
             same_record = by_record.get(record_index, [])
             for sibling in same_record:
                 if sibling.get("parent_id") != node_id:
@@ -486,7 +743,11 @@ def _expand_tree_hits(
     return selected[:max_nodes]
 
 
-def _format_tree_context(nodes: list[dict[str, Any]], fallback_chars: int) -> str:
+def _format_tree_context(
+    nodes: list[dict[str, Any]],
+    fallback_chars: int,
+    record_max_chars: int = RAG_RECORD_MAX_CHARS,
+) -> str:
     if not nodes:
         return ""
     blocks: list[str] = []
@@ -494,9 +755,9 @@ def _format_tree_context(nodes: list[dict[str, Any]], fallback_chars: int) -> st
     for node in nodes:
         title = str(node.get("title", "Node"))
         content = " ".join(str(node.get("content", "")).split())
-        if len(content) > 420:
-            content = content[:420].rstrip()
-        line = f"[{title}] (score: {node.get('score', 0.0)})\n{content}"
+        if len(content) > record_max_chars:
+            content = content[:record_max_chars].rstrip()
+        line = f"[{title}]\n{content}"
         if total + len(line) > fallback_chars:
             break
         blocks.append(line)
@@ -508,7 +769,7 @@ def _retrieve_from_tree_nodes(
     full_text: str,
     query: str,
     top_k: int = _TOP_K,
-    fallback_chars: int = 3000,
+    fallback_chars: int = RAG_MAX_CONTEXT_CHARS,
     nodes: list[dict[str, Any]] | None = None,
 ) -> tuple[str, bool]:
     nodes = nodes if nodes is not None else _build_tree_nodes(full_text)
@@ -518,8 +779,28 @@ def _retrieve_from_tree_nodes(
     query_text = (query or "").strip().lower()
     query_tokens, query_token_set, query_bigrams = _query_features(query_text)
     if not query_tokens:
-        default_nodes = [n for n in nodes if n.get("kind") == "record"][: max(top_k, 1)]
-        return (_format_tree_context(default_nodes, fallback_chars), True)
+        return ("", False)
+
+    records = _split_tree_records(full_text)
+    record_context, record_used = _retrieve_record_matches(
+        records,
+        query,
+        top_k,
+        fallback_chars,
+    )
+    if record_context:
+        return (record_context, record_used)
+
+    query_tokens = [
+        t for t in query_tokens if t not in _QUERY_STOPWORDS and len(t) >= 2
+    ]
+    query_token_set = set(query_tokens)
+    query_bigrams = []
+    if len(query_tokens) > 1:
+        for i in range(len(query_tokens) - 1):
+            query_bigrams.append(f"{query_tokens[i]} {query_tokens[i + 1]}")
+    if not query_tokens:
+        return ("", False)
 
     ranked: list[dict[str, Any]] = []
     nodes_by_id = {str(n.get("id", "")): n for n in nodes}
@@ -544,17 +825,19 @@ def _retrieve_from_tree_nodes(
 
     ranked.sort(key=lambda n: float(n.get("score", 0.0)), reverse=True)
     if not ranked:
-        default_nodes = [n for n in nodes if n.get("kind") == "record"][: max(top_k, 1)]
-        return (_format_tree_context(default_nodes, fallback_chars), True)
+        return ("", False)
 
     expanded = _expand_tree_hits(
-        ranked_nodes=ranked[: max(top_k * 2, 4)],
+        ranked_nodes=ranked[: max(top_k * 2, 3)],
         nodes_by_id=nodes_by_id,
         by_record=by_record,
-        max_nodes=max(top_k + 1, _MIN_MATCHED_NODES),
+        max_nodes=max(top_k, _MIN_MATCHED_NODES),
     )
 
-    return (_format_tree_context(expanded, fallback_chars), True)
+    context = _format_tree_context(expanded, fallback_chars)
+    if not context:
+        return ("", False)
+    return (context, True)
 
 
 def _load_or_build_company_tree(company_id: int, full_text: str) -> list[dict[str, Any]]:
@@ -593,10 +876,12 @@ def delete_training_file_for_company(company_id: int) -> bool:
 def retrieve_context_for_company(
     company_id: int,
     query: str,
-    top_k: int = _TOP_K,
-    fallback_chars: int = 3000,
+    top_k: int | None = None,
+    fallback_chars: int | None = None,
 ) -> tuple[str, bool]:
-    """Retrieve ranked RAG context for a company ID."""
+    top_k = top_k if top_k is not None else RAG_TOP_K
+    fallback_chars = fallback_chars if fallback_chars is not None else RAG_MAX_CONTEXT_CHARS
+
     full_text = load_training_file_for_company(company_id)
     if not full_text:
         return ("", False)
@@ -737,30 +1022,12 @@ def retrieve_context(
     user_full_name: str,
     company_name: str,
     query: str,
-    top_k: int = _TOP_K,
-    fallback_chars: int = 3000,
+    top_k: int | None = None,
+    fallback_chars: int | None = None,
 ) -> tuple[str, bool]:
-    """
-    Retrieve the most relevant chunks from the training file for *query*.
+    top_k = top_k if top_k is not None else RAG_TOP_K
+    fallback_chars = fallback_chars if fallback_chars is not None else RAG_MAX_CONTEXT_CHARS
 
-    Parameters
-    ----------
-    user_full_name, company_name : str
-        Identify which training file to use.
-    query : str
-        The user's chat message.
-    top_k : int
-        Maximum number of chunks to include in the returned context.
-    fallback_chars : int
-        If no RAG file exists, fall back to the first N chars of
-        ``db_training_data`` (handled by caller).
-
-    Returns
-    -------
-    (context_text, used_rag)
-        *context_text* — the retrieved/ranked context string.
-        *used_rag*     — True if the RAG file was used, False if fallback.
-    """
     full_text = load_training_file(user_full_name, company_name)
     if not full_text:
         return ("", False)

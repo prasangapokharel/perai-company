@@ -46,3 +46,7 @@ RATE_LIMIT_DEFAULT: str = getenv("RATE_LIMIT_DEFAULT", "120/minute")
 
 VECTOR_RAG_ENABLED: bool = getenv("VECTOR_RAG_ENABLED", "false").lower() == "true"
 WIDGET_CORS_ENABLED: bool = getenv("WIDGET_CORS_ENABLED", "true").lower() == "true"
+
+RAG_TOP_K: int = int(getenv("RAG_TOP_K", "3"))
+RAG_MAX_CONTEXT_CHARS: int = int(getenv("RAG_MAX_CONTEXT_CHARS", "1200"))
+RAG_RECORD_MAX_CHARS: int = int(getenv("RAG_RECORD_MAX_CHARS", "360"))

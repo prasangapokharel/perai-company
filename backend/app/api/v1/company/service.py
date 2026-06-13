@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from app.utils.password import hash_password, verify_password  # noqa: F401
 from app.utils.jsonl import normalize_jsonl_upload
 from app.core.finetune.rag.main import (
+    append_training_file_for_company,
     delete_training_file_for_company,
     load_training_file_for_company,
     save_training_file_for_company,
@@ -88,7 +89,10 @@ def upsert_company_finetune(
 ) -> CompanyFinetune:
     company = get_company(db, company_id)
     knowledge = normalize_jsonl_upload(payload.content)
-    path = save_training_file_for_company(company.id, knowledge)
+    if payload.mode == "append":
+        path = append_training_file_for_company(company.id, knowledge)
+    else:
+        path = save_training_file_for_company(company.id, knowledge)
 
     # Generate model name as perai-{company_name}
     model_name = f"perai-{company.company_name.lower().replace(' ', '-')}"

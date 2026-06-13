@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config.config import VECTOR_RAG_ENABLED
 from app.core.finetune.prompts.builder import build_company_system_prompt
-from app.core.finetune.rag.main import load_training_file_for_company, retrieve_context_for_company
+from app.core.finetune.rag.main import retrieve_context_for_company
 from app.models.companyRequests import CompanyRequest
 from app.models.company import Company
 from app.models.companySettings import CompanySettings
@@ -53,6 +53,9 @@ def createCompanyRequest(
 
 
 def _get_rag_context(db: Session, company_id: int, query: str) -> str | None:
+    if not (query or "").strip():
+        return None
+
     if VECTOR_RAG_ENABLED:
         try:
             from app.core.vector.vector import retrieve_context as vector_retrieve
@@ -70,8 +73,7 @@ def _get_rag_context(db: Session, company_id: int, query: str) -> str | None:
     except Exception:
         pass
 
-    raw = load_training_file_for_company(company_id)
-    return raw[:3000] if raw else None
+    return None
 
 
 def get_company_prompt(db: Session, company_id: int) -> tuple[Company, str]:

@@ -51,6 +51,15 @@ export function getCompanyFinetune(companyId: number, auth?: ApiAuth | string) {
   return apiClient<CompanyFinetune>(`/company/${companyId}/finetune`, {}, auth)
 }
 
-export function upsertCompanyFinetune(companyId: number, content: string, auth?: ApiAuth | string) {
-  return apiClient<CompanyFinetune>(`/company/${companyId}/finetune`, { method: "POST", body: JSON.stringify({ content }) }, auth)
+export function upsertCompanyFinetune(
+  companyId: number,
+  content: string,
+  auth?: ApiAuth | string,
+  mode: "append" | "replace" = "append",
+) {
+  return apiClient<CompanyFinetune>(
+    `/company/${companyId}/finetune`,
+    { method: "POST", body: JSON.stringify({ content, mode }) },
+    auth,
+  )
 }

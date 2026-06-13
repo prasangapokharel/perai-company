@@ -4,6 +4,8 @@ import { useState, useCallback } from "react"
 import { Upload, FileText, X, AlertCircle, Check, Download } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { upsertCompanyFinetune } from "@/services/company.service"
 import { JSONL_FORMAT_HELP, SAMPLE_JSONL, validateJsonl } from "@/lib/jsonl"
 
@@ -22,6 +24,7 @@ export function FinetuneUpload({ companyId, apiKey, onSuccess }: FinetuneUploadP
   const [isLoading, setIsLoading] = useState(false)
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle")
   const [message, setMessage] = useState("")
+  const [uploadMode, setUploadMode] = useState<"append" | "replace">("append")
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault()
@@ -91,9 +94,13 @@ export function FinetuneUpload({ companyId, apiKey, onSuccess }: FinetuneUploadP
         return
       }
 
-      await upsertCompanyFinetune(companyId, raw, apiKey)
+      await upsertCompanyFinetune(companyId, raw, apiKey, uploadMode)
       setStatus("success")
-      setMessage(`Uploaded ${result.lineCount} JSONL records. Vectorless BM25 index updated on disk.`)
+      setMessage(
+        uploadMode === "append"
+          ? `Added ${result.lineCount} records to your knowledge base. Previous content is kept.`
+          : `Replaced knowledge base with ${result.lineCount} JSONL records.`,
+      )
       setFile(null)
       setRecordCount(0)
       onSuccess?.()
@@ -103,7 +110,7 @@ export function FinetuneUpload({ companyId, apiKey, onSuccess }: FinetuneUploadP
     } finally {
       setIsLoading(false)
     }
-  }, [file, companyId, apiKey, onSuccess])
+  }, [file, companyId, apiKey, uploadMode, onSuccess])
 
   function downloadSample() {
     const blob = new Blob([SAMPLE_JSONL], { type: "application/jsonl" })
@@ -128,7 +135,35 @@ export function FinetuneUpload({ companyId, apiKey, onSuccess }: FinetuneUploadP
           <Download className="mr-2 h-4 w-4" />
           Download sample.jsonl
         </Button>
+        <p className="mt-3 text-xs text-muted-foreground">
+          Upload again anytime to add more topics (e.g. Class 12 results). The AI reads all saved knowledge.
+        </p>
       </div>
+
+      <RadioGroup
+        value={uploadMode}
+        onValueChange={(value) => setUploadMode(value as "append" | "replace")}
+        className="grid gap-2 sm:grid-cols-2"
+      >
+        <div className="flex items-start gap-2 rounded-lg border p-3">
+          <RadioGroupItem value="append" id="finetune-append" className="mt-0.5" />
+          <Label htmlFor="finetune-append" className="cursor-pointer space-y-0.5 font-normal">
+            <span className="block text-sm font-medium">Add to existing knowledge</span>
+            <span className="block text-xs text-muted-foreground">
+              Keep school info and append new JSONL records
+            </span>
+          </Label>
+        </div>
+        <div className="flex items-start gap-2 rounded-lg border p-3">
+          <RadioGroupItem value="replace" id="finetune-replace" className="mt-0.5" />
+          <Label htmlFor="finetune-replace" className="cursor-pointer space-y-0.5 font-normal">
+            <span className="block text-sm font-medium">Replace all knowledge</span>
+            <span className="block text-xs text-muted-foreground">
+              Remove old content and use this file only
+            </span>
+          </Label>
+        </div>
+      </RadioGroup>
 
       <div
         onDragEnter={handleDrag}
@@ -191,7 +226,11 @@ export function FinetuneUpload({ companyId, apiKey, onSuccess }: FinetuneUploadP
       )}
 
       <Button type="button" onClick={handleUpload} disabled={!file || isLoading} className="w-full">
-        {isLoading ? "Uploading..." : "Upload JSONL Knowledge Base"}
+        {isLoading
+          ? "Uploading..."
+          : uploadMode === "append"
+            ? "Add to Knowledge Base"
+            : "Replace Knowledge Base"}
       </Button>
     </div>
   )

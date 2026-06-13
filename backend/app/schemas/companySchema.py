@@ -107,6 +107,7 @@ class CompanyRead(BaseModel):
 
 class CompanyFinetuneUpload(BaseModel):
     content: str = Field(..., min_length=1)
+    mode: str = Field(default="append", pattern="^(append|replace)$")
 
 
 class CompanyFinetuneRead(BaseModel):

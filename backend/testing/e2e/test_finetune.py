@@ -70,16 +70,43 @@ def test_get_finetune_not_found(client: TestClient, company: dict, auth_headers:
 
 
 def test_upsert_replaces_existing(client: TestClient, company: dict, auth_headers: dict):
-    updated_knowledge = SAMPLE_KNOWLEDGE + "\n\n## Updated Section\nNew content here."
+    updated_knowledge = SAMPLE_KNOWLEDGE + '\n{"title":"Updated","content":"New content here."}'
     r = client.post(
         f"/api/v1/company/{company['id']}/finetune",
-        json={"content": updated_knowledge},
+        json={"content": updated_knowledge, "mode": "replace"},
         headers=auth_headers,
     )
     assert r.status_code == 201
 
     get_r = client.get(f"/api/v1/company/{company['id']}/finetune", headers=auth_headers)
     assert get_r.status_code == 200
+
+
+def test_upload_appends_to_existing_knowledge(client: TestClient, company: dict, auth_headers: dict):
+    first = '{"question":"What grades do you offer?","answer":"We offer grades 1 through 11."}'
+    second = '{"title":"Class 12 Results","content":"98% pass rate with 45 distinctions."}'
+
+    r1 = client.post(
+        f"/api/v1/company/{company['id']}/finetune",
+        json={"content": first, "mode": "append"},
+        headers=auth_headers,
+    )
+    assert r1.status_code == 201
+
+    r2 = client.post(
+        f"/api/v1/company/{company['id']}/finetune",
+        json={"content": second, "mode": "append"},
+        headers=auth_headers,
+    )
+    assert r2.status_code == 201
+
+    content = client.get(
+        f"/api/v1/company/{company['id']}/finetune",
+        headers=auth_headers,
+    ).json()["content"]
+    assert "grades 1 through 11" in content
+    assert "Class 12 Results" in content
+    assert "98% pass rate" in content
 
 
 def test_delete_finetune(client: TestClient, company: dict, auth_headers: dict):
