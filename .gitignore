@@ -14,3 +14,5 @@ backend/py/audiobooks/
 backend/py/tts_onnx.egg-info/
 backend/py/uv.lock
 node_modules/
+/test.py
+backend/py/assets

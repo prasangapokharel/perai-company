@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { registerCompany, loginCompany } from "@/services/auth.service"
 import { ensureDefaultApiKey } from "@/services/session-bootstrap.service"
-import { saveAuthSession } from "@/features/auth/hooks"
+import { saveAuthSession, type AuthSession } from "@/features/auth/hooks"
 import { APIError } from "@/lib/api-client"
 import { AuthLogo } from "@/components/auth/AuthLogo"
 
@@ -51,7 +51,7 @@ export function SignupForm({
 
       const login = await loginCompany(email, password)
 
-      let session = {
+      let session: AuthSession = {
         companyId: company.id,
         apiKey: "",
         accessToken: login.access_token,

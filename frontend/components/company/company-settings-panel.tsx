@@ -84,7 +84,7 @@ export function CompanySettingsPanel() {
         <FieldGroup>
           <Field>
             <FieldLabel>Language</FieldLabel>
-            <Select value={language} onValueChange={setLanguage}>
+            <Select value={language} onValueChange={(value) => setLanguage(value ?? "english")}>
               <SelectTrigger><SelectValue placeholder="Language" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="english">English</SelectItem>
@@ -94,7 +94,7 @@ export function CompanySettingsPanel() {
           </Field>
           <Field>
             <FieldLabel>Tone</FieldLabel>
-            <Select value={tone} onValueChange={setTone}>
+            <Select value={tone} onValueChange={(value) => setTone(value ?? "formal")}>
               <SelectTrigger><SelectValue placeholder="Tone" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="formal">Formal</SelectItem>

@@ -19,8 +19,6 @@ const PROTECTED_PREFIXES = [
   "/settings",
   "/ticket",
   "/profile",
-  "/config",
-  "/analytics",
 ]
 
 function isGuestPath(pathname: string) {
@@ -77,7 +75,5 @@ export const config = {
     "/settings/:path*",
     "/ticket/:path*",
     "/profile/:path*",
-    "/config/:path*",
-    "/analytics/:path*",
   ],
 }

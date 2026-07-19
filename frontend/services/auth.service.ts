@@ -1,5 +1,4 @@
 import { apiClientAuth } from "@/lib/api-auth"
-import type { CompanyRead } from "@/services/auth.service"
 
 export type CompanyRead = {
   id: number

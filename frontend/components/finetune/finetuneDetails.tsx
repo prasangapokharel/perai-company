@@ -11,6 +11,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { getCompanyFinetune } from "@/services/company.service"
 import type { CompanyFinetune } from "@/services/company.service"
+import { APIError } from "@/lib/api-client"
 
 import type { ApiAuth } from "@/lib/api-auth"
 
@@ -30,7 +31,12 @@ export function FinetuneDetails({ companyId, apiKey }: FinetuneDetailsProps) {
         const result = await getCompanyFinetune(companyId, apiKey)
         setData(result)
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Failed to load finetune")
+        if (e instanceof APIError && e.status === 404) {
+          // No knowledge base uploaded yet — show the empty state, not an error.
+          setData(null)
+        } else {
+          setError(e instanceof Error ? e.message : "Failed to load finetune")
+        }
       } finally {
         setLoading(false)
       }
@@ -71,7 +77,9 @@ export function FinetuneDetails({ companyId, apiKey }: FinetuneDetailsProps) {
           <CardTitle>Finetune Details</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">No finetune configuration found</p>
+          <p className="text-sm text-muted-foreground">
+            No knowledge base yet. Upload a JSONL file below to create one.
+          </p>
         </CardContent>
       </Card>
     )

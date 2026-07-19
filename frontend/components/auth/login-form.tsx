@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { loginCompany } from "@/services/auth.service"
 import { ensureDefaultApiKey } from "@/services/session-bootstrap.service"
-import { saveAuthSession } from "@/features/auth/hooks"
+import { saveAuthSession, type AuthSession } from "@/features/auth/hooks"
 import { APIError } from "@/lib/api-client"
 import { AuthLogo } from "@/components/auth/AuthLogo"
 
@@ -44,7 +44,7 @@ export function LoginForm({
       const company = response.company
 
       // Save session
-      let session = {
+      let session: AuthSession = {
         companyId: company.id,
         apiKey: "",
         accessToken: response.access_token,
