@@ -14,8 +14,10 @@ import { getAuthMe } from "@/services/auth.service"
 import {
   CREDIT_PACKAGES,
   getCompanyBalance,
+  initiateKhaltiTopup,
   listBalanceTopups,
   topupCompanyBalance,
+  verifyKhaltiTopup,
 } from "@/services/balance.service"
 
 export default function BalancePage() {
@@ -61,7 +63,51 @@ export default function BalancePage() {
     load()
   }, [load])
 
-  async function handlePay() {
+  // After Khalti redirects back with ?pidx=..., verify the payment server-side.
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const pidx = params.get("pidx")
+    if (!pidx) return
+    window.history.replaceState({}, "", "/balance")
+
+    const sess = loadAuthSession()
+    if (!sess) return
+
+    setPaying(true)
+    verifyKhaltiTopup(sess, pidx)
+      .then(async (result) => {
+        if (result.status === "Completed") {
+          setSuccess(`Payment complete — added $${Number(result.amount_usd).toFixed(2)} to your account.`)
+        } else {
+          setError(`Khalti payment not completed (status: ${result.status}). You were not charged.`)
+        }
+        await load()
+      })
+      .catch((err) => {
+        if (err instanceof APIError) setError(err.detail)
+        else if (err instanceof Error) setError(err.message)
+        else setError("Could not verify Khalti payment")
+      })
+      .finally(() => setPaying(false))
+  }, [load])
+
+  async function handleKhaltiPay() {
+    if (!session) return
+    setPaying(true)
+    setError("")
+    setSuccess("")
+    try {
+      const result = await initiateKhaltiTopup(session, selected)
+      window.location.href = result.payment_url
+    } catch (err) {
+      if (err instanceof APIError) setError(err.detail)
+      else if (err instanceof Error) setError(err.message)
+      else setError("Could not start Khalti payment")
+      setPaying(false)
+    }
+  }
+
+  async function handleDemoPay() {
     if (!session) return
     setPaying(true)
     setError("")
@@ -148,9 +194,25 @@ export default function BalancePage() {
               </button>
             ))}
           </div>
-          <Button type="button" className="w-full sm:w-auto" disabled={paying} onClick={handlePay}>
-            {paying ? "Processing..." : `Pay $${selected.toFixed(2)}`}
-          </Button>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Button
+              type="button"
+              className="w-full bg-[#5C2D91] text-white hover:bg-[#4b2478] sm:w-auto"
+              disabled={paying}
+              onClick={handleKhaltiPay}
+            >
+              {paying ? "Processing..." : `Pay $${selected.toFixed(2)} with Khalti`}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full sm:w-auto"
+              disabled={paying}
+              onClick={handleDemoPay}
+            >
+              Add free credits (dev)
+            </Button>
+          </div>
         </CardContent>
       </Card>
 

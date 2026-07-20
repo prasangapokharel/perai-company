@@ -7,6 +7,7 @@ from app.models.chatMessage import ChatMessage
 from app.models.company import APIKey, Company, CompanyFinetune
 from app.models.companyRequests import CompanyRequest
 from app.models.companySettings import CompanySettings
+from app.models.khalti_payment import KhaltiPayment
 from app.models.ticket import Ticket, TicketOpened
 
 __all__ = [
@@ -19,6 +20,7 @@ __all__ = [
     "CompanyFinetune",
     "CompanyRequest",
     "CompanySettings",
+    "KhaltiPayment",
     "Ticket",
     "TicketOpened",
 ]

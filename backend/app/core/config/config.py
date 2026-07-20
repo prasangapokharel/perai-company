@@ -98,3 +98,7 @@ TTS_MAX_CHARS: int = int(getenv("TTS_MAX_CHARS", "1200"))
 
 DEFAULT_MAX_TOKENS: int = int(getenv("DEFAULT_MAX_TOKENS", "350"))
 CHAT_COMPLETION_CAP: int = int(getenv("CHAT_COMPLETION_CAP", "400"))
+
+KHALTI_SECRET_KEY: str = getenv("KHALTI_SECRET_KEY", "")
+KHALTI_BASE_URL: str = getenv("KHALTI_BASE_URL", "https://dev.khalti.com/api/v2").rstrip("/")
+KHALTI_USD_TO_NPR: str = getenv("KHALTI_USD_TO_NPR", "140")

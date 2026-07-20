@@ -39,6 +39,32 @@ class BalanceDeductRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class KhaltiInitiateCreate(BaseModel):
+    amount: Decimal = Field(..., gt=0, le=500, description="USD credit amount (max 500)")
+
+
+class KhaltiInitiateRead(BaseModel):
+    pidx: str
+    payment_url: str
+    amount_usd: Decimal
+    amount_npr_paisa: int
+    status: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class KhaltiVerifyCreate(BaseModel):
+    pidx: str = Field(..., min_length=1, max_length=64)
+
+
+class KhaltiVerifyRead(BaseModel):
+    pidx: str
+    status: str
+    amount_usd: Decimal
+    balance: Decimal
+    currency: str = "USD"
+
+
 class AuthMeResponse(BaseModel):
     company_id: int
     company_name: str

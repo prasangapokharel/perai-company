@@ -24,6 +24,7 @@ def _ensure_test_schema():
         import app.models.company  # noqa: F401
         import app.models.companyRequests  # noqa: F401
         import app.models.companySettings  # noqa: F401
+        import app.models.khalti_payment  # noqa: F401
         import app.models.ticket  # noqa: F401
         Base.metadata.create_all(bind=engine)
     yield

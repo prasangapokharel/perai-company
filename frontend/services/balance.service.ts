@@ -51,6 +51,38 @@ export function topupCompanyBalance(session: AuthSession, amount: number) {
   )
 }
 
+export type KhaltiInitiate = {
+  pidx: string
+  payment_url: string
+  amount_usd: string
+  amount_npr_paisa: number
+  status: string
+}
+
+export type KhaltiVerify = {
+  pidx: string
+  status: string
+  amount_usd: string
+  balance: string
+  currency: string
+}
+
+export function initiateKhaltiTopup(session: AuthSession, amount: number) {
+  return apiClientAuth<KhaltiInitiate>(
+    `/companyBalance/${session.companyId}/khalti/initiate`,
+    { method: "POST", body: JSON.stringify({ amount }) },
+    sessionAuth(session),
+  )
+}
+
+export function verifyKhaltiTopup(session: AuthSession, pidx: string) {
+  return apiClientAuth<KhaltiVerify>(
+    `/companyBalance/${session.companyId}/khalti/verify`,
+    { method: "POST", body: JSON.stringify({ pidx }) },
+    sessionAuth(session),
+  )
+}
+
 export function listBalanceTopups(session: AuthSession) {
   return apiClientAuth<BalanceTopup[]>(
     `/companyBalance/${session.companyId}/topups`,

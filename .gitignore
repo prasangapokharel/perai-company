@@ -1,5 +1,7 @@
 .cursor
-docs
+/docs/*
+!/docs/collegedocumentation
+backend/docs
 frontend/.agents
 backend/.agent
 .env
