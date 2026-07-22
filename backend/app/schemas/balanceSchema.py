@@ -71,5 +71,6 @@ class AuthMeResponse(BaseModel):
     company_email: str
     balance: Decimal
     currency: str = "USD"
+    is_admin: bool = False
 
     model_config = ConfigDict(from_attributes=True)

@@ -7,6 +7,7 @@ export type CompanyRead = {
   logo?: string | null
   website?: string | null
   company_model_name?: string | null
+  is_admin?: boolean
   created_at: string
   updated_at: string
 }
@@ -17,6 +18,7 @@ export type AuthMeResponse = {
   company_email: string
   balance: string
   currency: string
+  is_admin?: boolean
 }
 
 export type AuthLoginResponse = {

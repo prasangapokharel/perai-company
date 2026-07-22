@@ -52,6 +52,7 @@ def auth_me(
         company_email=company.company_email,
         balance=balance,
         currency="USD",
+        is_admin=bool(company.is_admin),
     )
 
 

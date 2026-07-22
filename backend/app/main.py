@@ -23,6 +23,7 @@ from app.api.v1.companyRequests.route import router as company_requests_router
 from app.api.v1.apikey.route import router as apikey_router
 from app.api.v1.ticket.route import router as ticket_router
 from app.api.v1.companySettings.route import router as company_settings_router
+from app.api.v1.admin.route import router as admin_router
 from app.api.v1.files.route import router as files_router
 from app.core.config.config import FRONTEND_URL, WIDGET_CORS_ENABLED
 from app.core.database import init_db
@@ -95,6 +96,7 @@ app.include_router(chat_messages_router)
 app.include_router(apikey_router)
 app.include_router(ticket_router)
 app.include_router(company_settings_router)
+app.include_router(admin_router)
 app.include_router(files_router)
 
 

@@ -150,3 +150,28 @@ async def require_api_key_company(
             detail="API key does not belong to this company.",
         )
     return db_key.company_id
+
+
+# ---------------------------------------------------------------------------
+# Admin guard: caller must be a platform admin (Company.is_admin)
+# ---------------------------------------------------------------------------
+
+
+def require_admin(
+    auth_company_id: int = Depends(get_auth_company_id),
+    db: Session = Depends(get_db),
+) -> int:
+    """Dependency that verifies the authenticated company is a platform admin.
+
+    Unlike require_company, admin routes are NOT scoped to a path company_id —
+    an admin acts across all companies.
+    """
+    from app.models.company import Company  # lazy import avoids circular
+
+    company = db.query(Company).filter(Company.id == auth_company_id).one_or_none()
+    if company is None or not company.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required.",
+        )
+    return auth_company_id

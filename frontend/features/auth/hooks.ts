@@ -13,6 +13,7 @@ export type AuthSession = {
   balance?: string
   currency?: string
   companyName?: string
+  isAdmin?: boolean
 }
 
 const AUTH_SESSION_KEY = "perai_auth_session"

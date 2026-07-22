@@ -42,6 +42,7 @@ export function LoginForm({
       // Login company
       const response = await loginCompany(email, password)
       const company = response.company
+      const isAdmin = Boolean(company.is_admin)
 
       // Save session
       let session: AuthSession = {
@@ -51,7 +52,16 @@ export function LoginForm({
         companyName: company.company_name,
         balance: undefined,
         currency: "USD",
+        isAdmin,
       }
+
+      if (isAdmin) {
+        // Admins operate via JWT and don't need a company API key.
+        saveAuthSession(session)
+        router.push("/admin")
+        return
+      }
+
       session = await ensureDefaultApiKey(session)
       saveAuthSession(session)
 

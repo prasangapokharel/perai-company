@@ -99,6 +99,7 @@ class CompanyRead(BaseModel):
     logo: str | None = None
     website: str | None = None
     company_model_name: str | None = None
+    is_admin: bool = False
     created_at: datetime
     updated_at: datetime
 
