@@ -1,0 +1,41 @@
+flowchart LR
+    CA((Company\nAdmin))
+    EU((End User /\nWebsite Visitor))
+    KH((Khalti\nGateway))
+    LLM((Groq LLM\nProvider))
+
+    subgraph Perai [Perai Platform]
+        UC01([Register])
+        UC02([Login])
+        UC03([Upload Knowledge Base])
+        UC04([Configure Settings])
+        UC05([Manage API Keys])
+        UC06([View Balance & Usage])
+        UC07([Initiate Khalti Payment])
+        UC08([Verify Khalti Payment])
+        UC09([Open Support Ticket])
+        UC10([Embed Chat Widget])
+        UC11([Chat with AI - Streaming])
+        UC12([Chat with AI - Non-Streaming])
+        UC13([Receive TTS Audio Reply])
+    end
+
+    CA --> UC01
+    CA --> UC02
+    CA --> UC03
+    CA --> UC04
+    CA --> UC05
+    CA --> UC06
+    CA --> UC07
+    CA --> UC08
+    CA --> UC09
+    CA --> UC10
+
+    EU --> UC11
+    EU --> UC12
+    EU --> UC13
+
+    UC07 --> KH
+    UC08 --> KH
+    UC11 --> LLM
+    UC12 --> LLM

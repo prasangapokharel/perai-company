@@ -1,0 +1,26 @@
+sequenceDiagram
+    actor Admin
+    participant UI as Next.js Dashboard
+    participant API as FastAPI Backend
+    participant DB as Database
+
+    Admin->>UI: Fill registration form
+    UI->>API: POST /api/v1/auth/register
+    API->>API: Validate inputs
+    API->>API: Hash password (bcrypt)
+    API->>DB: INSERT company row
+    API->>DB: INSERT company_balance (starting credits)
+    API->>DB: INSERT company_settings (defaults)
+    API->>DB: INSERT api_key (default key)
+    API-->>UI: 201 Company created
+    UI-->>Admin: Redirect to /login
+
+    Admin->>UI: Enter email + password
+    UI->>API: POST /api/v1/auth/login
+    API->>DB: SELECT company WHERE email=?
+    API->>API: Verify password hash
+    API->>API: Sign JWT (company_id, exp)
+    API-->>UI: 200 {access_token, company}
+    UI->>UI: Save session to localStorage
+    UI->>UI: Set auth cookie (perai_auth=1)
+    UI-->>Admin: Redirect to /dashboard

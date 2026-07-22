@@ -1,0 +1,16 @@
+flowchart TD
+    S([Start]) --> A[Admin opens Finetune page]
+    A --> B[Select JSONL file from disk]
+    B --> C{Choose mode}
+    C -- Append --> D[Keep existing knowledge]
+    C -- Replace --> E[Delete existing knowledge file]
+    D --> F[Parse JSONL: validate each line]
+    E --> F
+    F --> G{Any invalid\nJSON line?}
+    G -- Yes --> H[Return error with line number]
+    H --> B
+    G -- No --> I[Normalize records:\nquestion/answer,\ntitle/content, or text]
+    I --> J[Write normalized records\nto per-company RAG file]
+    J --> K[Upsert company_finetune row\nmodel name + file path]
+    K --> L[Knowledge base instantly\navailable for retrieval]
+    L --> E2([End])

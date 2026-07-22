@@ -1,0 +1,137 @@
+classDiagram
+    class Company {
+        +int id
+        +String company_name
+        +String company_email
+        +String password_hash
+        +String logo
+        +String website
+        +DateTime created_at
+        +DateTime updated_at
+        +register(name, email, password) Company
+        +login(email, password) JWT
+        +update(data) Company
+    }
+
+    class APIKey {
+        +int id
+        +int company_id
+        +String name
+        +String key_hash
+        +String key_preview
+        +String status
+        +DateTime expiry_date
+        +DateTime last_used_at
+        +create(company_id, name) APIKey
+        +revoke() void
+        +validate(raw_key) bool
+    }
+
+    class CompanyFinetune {
+        +int id
+        +int company_id
+        +String company_model_name
+        +String rag_company_path
+        +String content
+        +DateTime created_at
+        +DateTime updated_at
+        +upload(jsonl_content, mode) CompanyFinetune
+        +retrieve_context(query, top_k) List~String~
+    }
+
+    class CompanySettings {
+        +int id
+        +int company_id
+        +String language
+        +String tone
+        +int max_tokens
+        +DateTime created_at
+        +update(language, tone, max_tokens) CompanySettings
+    }
+
+    class CompanyBalance {
+        +int id
+        +int company_id
+        +Decimal balance
+        +DateTime updated_at
+        +reserve(amount) Decimal
+        +release(amount) void
+        +finalize(reserved, actual) BalanceDeduct
+        +topup(amount, reference) BalanceTopup
+    }
+
+    class BalanceTopup {
+        +int id
+        +int company_id
+        +Decimal amount
+        +String reference
+        +DateTime created_at
+    }
+
+    class BalanceDeduct {
+        +int id
+        +int company_id
+        +int chat_message_id
+        +String session_id
+        +Decimal amount
+        +int token_consume
+        +String model_name
+        +DateTime created_at
+    }
+
+    class ChatMessage {
+        +int id
+        +int company_id
+        +String session_id
+        +String conversation
+        +String review
+        +String ip
+        +int token_consume
+        +String model_name
+        +DateTime created_at
+        +log(prompt, reply, tokens) ChatMessage
+    }
+
+    class KhaltiPayment {
+        +int id
+        +int company_id
+        +String pidx
+        +Decimal amount_usd
+        +int amount_npr_paisa
+        +String status
+        +String transaction_id
+        +DateTime created_at
+        +initiate(amount_usd) KhaltiPayment
+        +verify(pidx) KhaltiPayment
+    }
+
+    class Ticket {
+        +int id
+        +int company_id
+        +String issue
+        +String category
+        +String status
+        +DateTime created_at
+        +create(issue, category) Ticket
+        +close() void
+    }
+
+    class TicketOpened {
+        +int id
+        +int company_id
+        +int ticket_id
+        +DateTime opened_at
+        +DateTime closed_at
+    }
+
+    Company "1" --> "0..*" APIKey : owns
+    Company "1" --> "0..1" CompanyFinetune : has
+    Company "1" --> "0..1" CompanySettings : configures
+    Company "1" --> "0..1" CompanyBalance : holds
+    Company "1" --> "0..*" BalanceTopup : receives
+    Company "1" --> "0..*" BalanceDeduct : charged
+    Company "1" --> "0..*" ChatMessage : logs
+    Company "1" --> "0..*" KhaltiPayment : pays via
+    Company "1" --> "0..*" Ticket : opens
+    Ticket "1" --> "0..*" TicketOpened : has history
+    ChatMessage "1" --> "0..1" BalanceDeduct : priced by

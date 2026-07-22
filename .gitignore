@@ -1,6 +1,7 @@
 .cursor
 /docs/*
 !/docs/collegedocumentation
+!/docs/figure
 backend/docs
 frontend/.agents
 backend/.agent

@@ -1,0 +1,34 @@
+sequenceDiagram
+    actor Admin
+    participant UI as Balance Page
+    participant API as FastAPI Backend
+    participant DB as Database
+    participant Khalti as Khalti Gateway
+
+    Admin->>UI: Select $5 package & click Pay
+    UI->>API: POST /companyBalance/{id}/khalti/initiate\n{amount: 5}
+    API->>API: Convert USD to NPR paisa\n(5 * 140 * 100 = 70000 paisa)
+    API->>Khalti: POST /epayment/initiate/\n{amount:70000, return_url:...}
+    Khalti-->>API: {pidx:"kfmNu...", payment_url:"https://..."}
+    API->>DB: INSERT khalti_payment (pidx, status=Initiated)
+    API-->>UI: {pidx, payment_url, amount_npr_paisa:70000}
+    UI->>UI: Redirect browser to payment_url
+
+    Admin->>Khalti: Complete payment (wallet/bank)
+    Khalti->>UI: Redirect to /balance?pidx=kfmNu...
+
+    UI->>API: POST /companyBalance/{id}/khalti/verify\n{pidx:"kfmNu..."}
+    API->>DB: SELECT khalti_payment WHERE pidx=?
+    API->>DB: SELECT balance_topup WHERE reference="khalti:kfmNu..." (idempotency check)
+    alt Not yet credited
+        API->>Khalti: POST /epayment/lookup/\n{pidx:"kfmNu..."}
+        Khalti-->>API: {status:"Completed", total_amount:70000}
+        API->>API: Verify total_amount == amount_npr_paisa
+        API->>DB: UPDATE company_balance (+5.00 USD)
+        API->>DB: INSERT balance_topup (amount=5, reference="khalti:kfmNu...")
+        API->>DB: UPDATE khalti_payment (status=Completed)
+    else Already credited
+        API->>API: Skip crediting (idempotent)
+    end
+    API-->>UI: {status:"Completed", balance:29.50}
+    UI-->>Admin: Show updated balance & success message

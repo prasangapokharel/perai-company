@@ -1,0 +1,28 @@
+sequenceDiagram
+    actor User
+    participant Widget as Chat Widget
+    participant API as FastAPI Backend
+    participant RAG as RAG Service
+    participant LLM as Groq LLM API
+    participant DB as Database
+
+    User->>Widget: Type message & submit
+    Widget->>API: POST /company/{id}/chat/stream\n(X-API-Key header)
+    API->>DB: SELECT api_key WHERE hash=SHA256(key)
+    DB-->>API: Key valid, company_id returned
+    API->>DB: UPDATE balance (reserve estimated credits)
+    API->>RAG: retrieve_context(message, top_k=3)
+    RAG->>RAG: BM25 rank knowledge file
+    RAG-->>API: Top-K matching records
+    API->>API: Build prompt (tone + language + context)
+    API->>LLM: POST /chat/completions (stream=true)
+    loop Stream tokens
+        LLM-->>API: Token chunk
+        API-->>Widget: data: {"type":"token","content":"..."}
+    end
+    LLM-->>API: [DONE]
+    API->>DB: INSERT chat_message row
+    API->>DB: UPDATE balance (finalize deduction)
+    API->>DB: INSERT balance_deduct row
+    API-->>Widget: data: {"type":"done"}
+    Widget-->>User: Display complete reply

@@ -1,0 +1,100 @@
+erDiagram
+    COMPANY ||--o{ API_KEY : owns
+    COMPANY ||--|| COMPANY_FINETUNE : has
+    COMPANY ||--|| COMPANY_SETTINGS : configures
+    COMPANY ||--|| COMPANY_BALANCE : holds
+    COMPANY ||--o{ BALANCE_TOPUP : receives
+    COMPANY ||--o{ BALANCE_DEDUCT : "is charged"
+    COMPANY ||--o{ CHAT_MESSAGE : logs
+    COMPANY ||--o{ COMPANY_REQUESTS : makes
+    COMPANY ||--o{ TICKET : opens
+    COMPANY ||--o{ KHALTI_PAYMENT : "pays via"
+    TICKET ||--o{ TICKET_OPENED : "has history"
+    CHAT_MESSAGE ||--o{ BALANCE_DEDUCT : "priced by"
+
+    COMPANY {
+        int id PK
+        varchar company_name
+        varchar company_email UK
+        varchar password_hash
+        varchar logo
+        varchar website
+        datetime created_at
+        datetime updated_at
+    }
+    API_KEY {
+        int id PK
+        int company_id FK
+        varchar name
+        varchar key_hash
+        varchar key_preview
+        varchar status
+        datetime expiry_date
+        datetime last_used_at
+    }
+    COMPANY_FINETUNE {
+        int id PK
+        int company_id FK
+        varchar company_model_name
+        varchar rag_company_path
+    }
+    COMPANY_SETTINGS {
+        int id PK
+        int company_id FK
+        varchar language
+        varchar tone
+        int max_tokens
+    }
+    COMPANY_BALANCE {
+        int id PK
+        int company_id FK
+        numeric balance
+        datetime updated_at
+    }
+    BALANCE_TOPUP {
+        int id PK
+        int company_id FK
+        numeric amount
+        varchar reference
+        datetime created_at
+    }
+    BALANCE_DEDUCT {
+        int id PK
+        int company_id FK
+        int chat_message_id FK
+        varchar session_id
+        numeric amount
+        int token_consume
+        varchar model_name
+    }
+    CHAT_MESSAGE {
+        int id PK
+        int company_id FK
+        varchar session_id
+        text conversation
+        int token_consume
+        varchar model_name
+    }
+    TICKET {
+        int id PK
+        int company_id FK
+        text issue
+        varchar category
+        varchar status
+    }
+    TICKET_OPENED {
+        int id PK
+        int company_id FK
+        int ticket_id FK
+        datetime opened_at
+        datetime closed_at
+    }
+    KHALTI_PAYMENT {
+        int id PK
+        int company_id FK
+        varchar pidx UK
+        numeric amount_usd
+        int amount_npr_paisa
+        varchar status
+        varchar transaction_id
+    }

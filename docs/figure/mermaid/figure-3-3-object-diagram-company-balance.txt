@@ -1,0 +1,35 @@
+classDiagram
+    class company_1 {
+        id = 1
+        company_name = "ABC School"
+        company_email = "admin@abcschool.edu.np"
+        language = "nepali"
+        tone = "formal"
+    }
+
+    class balance_1 {
+        id = 1
+        company_id = 1
+        balance = 24.50 USD
+        updated_at = "2026-07-20 10:30"
+    }
+
+    class topup_1 {
+        id = 3
+        company_id = 1
+        amount = 5.00
+        reference = "khalti:kfmNu4SaBT"
+        created_at = "2026-07-20 09:15"
+    }
+
+    class deduct_1 {
+        id = 14
+        company_id = 1
+        amount = 0.000480
+        token_consume = 220
+        model_name = "llama-3.3-70b"
+    }
+
+    company_1 --> balance_1 : holds
+    balance_1 --> topup_1 : credited by
+    balance_1 --> deduct_1 : debited by

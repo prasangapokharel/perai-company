@@ -1,0 +1,10 @@
+flowchart LR
+    A([Start]) --> B[Requirement\nGathering]
+    B --> C[Module\nDesign]
+    C --> D[Implementation]
+    D --> E[Testing &\nValidation]
+    E --> F{More\nModules?}
+    F -- Yes --> C
+    F -- No --> G[System\nIntegration]
+    G --> H[Final Testing]
+    H --> I([Release])

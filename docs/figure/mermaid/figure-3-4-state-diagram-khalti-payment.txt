@@ -1,0 +1,12 @@
+stateDiagram-v2
+    [*] --> Initiated : Admin selects package\n& calls initiate API
+    Initiated --> Pending : Khalti processes\npayment request
+    Pending --> Completed : User pays\nsuccessfully
+    Pending --> Expired : Payment not\ncompleted in time
+    Pending --> Canceled : User cancels\nthe payment
+    Completed --> Credited : System verifies\n& credits balance
+    Credited --> [*]
+    Expired --> [*]
+    Canceled --> [*]
+    Completed --> AmountMismatch : Paid amount does not equal\ninitiated amount
+    AmountMismatch --> [*]

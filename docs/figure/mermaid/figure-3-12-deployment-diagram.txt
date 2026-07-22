@@ -1,0 +1,33 @@
+flowchart TB
+    subgraph Client ["Client Devices"]
+        BROWSER[Web Browser\nCompany Admin]
+        ENDUSER[End User Browser\nor Mobile]
+    end
+
+    subgraph VPS ["Production Server (VPS / Cloud)"]
+        subgraph FE_SERVER ["Frontend Node"]
+            NEXTJS[Next.js Server\nPort 3000\nNode.js runtime]
+        end
+        subgraph BE_SERVER ["Backend Node"]
+            UVICORN[Uvicorn ASGI Server\nPort 8000\nPython 3.11+]
+            FASTAPI_APP[FastAPI Application]
+            STATIC[/RAG Knowledge Files\n/storage/companies/]
+        end
+        subgraph DB_SERVER ["Database Node"]
+            POSTGRES[(PostgreSQL 15\nPort 5432)]
+        end
+    end
+
+    subgraph Cloud_Services ["External Cloud Services"]
+        GROQ_API[Groq LLM API\napi.groq.com]
+        KHALTI_API[Khalti ePayment\nkhalti.com/api/v2]
+    end
+
+    BROWSER -- "HTTPS :443" --> NEXTJS
+    ENDUSER -- "HTTPS :443 (widget)" --> UVICORN
+    NEXTJS -- "HTTP :8000 (internal)" --> UVICORN
+    UVICORN --> FASTAPI_APP
+    FASTAPI_APP -- "SQLAlchemy\nTCP :5432" --> POSTGRES
+    FASTAPI_APP -- "File I/O" --> STATIC
+    FASTAPI_APP -- "HTTPS API call" --> GROQ_API
+    FASTAPI_APP -- "HTTPS API call" --> KHALTI_API

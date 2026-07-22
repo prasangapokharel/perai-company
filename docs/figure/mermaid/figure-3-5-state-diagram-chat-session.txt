@@ -1,0 +1,15 @@
+stateDiagram-v2
+    [*] --> Idle : API key validated
+    Idle --> Reserving : Message received
+    Reserving --> InsufficientBalance : Balance < estimated cost
+    Reserving --> Retrieving : Credits reserved
+    InsufficientBalance --> [*] : Return 402 error
+    Retrieving --> Building : Context retrieved\nfrom RAG file
+    Building --> Generating : Prompt built with\ntone + context
+    Generating --> Streaming : LLM generates tokens
+    Streaming --> Finalizing : All tokens received
+    Finalizing --> Logged : Deduction finalized,\nmessage saved
+    Logged --> [*]
+    Generating --> Error : LLM provider\nfailure
+    Error --> Released : Reservation released
+    Released --> [*] : Return error

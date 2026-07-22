@@ -1,0 +1,37 @@
+flowchart TD
+    S([Start]) --> A[Receive chat message\n+ X-API-Key header]
+    A --> B[Hash the API key\nSHA-256]
+    B --> C{Key found in DB\n& status=active?}
+    C -- No --> ERR1[Return 401 Unauthorized]
+    ERR1 --> X([End])
+    C -- Yes --> D{Key expired?}
+    D -- Yes --> ERR2[Return 401 Key expired]
+    ERR2 --> X
+    D -- No --> E[Estimate token cost\nfrom message length]
+    E --> F{Balance >=\nestimated cost?}
+    F -- No --> ERR3[Return 402\nInsufficient Balance]
+    ERR3 --> X
+    F -- Yes --> G[Reserve estimated\ncredits - row lock]
+    G --> H[Retrieve top-K records\nBM25 ranking]
+    H --> I[Load company settings\nlanguage, tone, max_tokens]
+    I --> J[Build system prompt\nwith tone + language]
+    J --> K[Append retrieved context\nto prompt]
+    K --> L[Call Groq LLM\nwith fallback key rotation]
+    L --> M{LLM call\nsucceeded?}
+    M -- No --> N[Release reservation]
+    N --> ERR4[Return 503 LLM Error]
+    ERR4 --> X
+    M -- Yes --> O{Streaming\nrequested?}
+    O -- Yes --> P[Stream tokens\nvia SSE to client]
+    O -- No --> Q[Wait for complete\nresponse]
+    P --> R[Count actual tokens used]
+    Q --> R
+    R --> S2{Audio\nrequested?}
+    S2 -- Yes --> T[Generate TTS WAV\nencode as base64]
+    S2 -- No --> U[Skip TTS]
+    T --> V[Finalize deduction:\nrefund or deduct difference]
+    U --> V
+    V --> W[INSERT chat_message row]
+    W --> Y[INSERT balance_deduct row]
+    Y --> Z[Return response to client]
+    Z --> X

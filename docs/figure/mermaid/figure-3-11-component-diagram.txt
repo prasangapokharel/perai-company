@@ -1,0 +1,47 @@
+flowchart TB
+    subgraph Frontend ["Frontend Component (Next.js)"]
+        DASH[Dashboard Pages\n14 React pages]
+        MW[Middleware\nAuth cookie guard]
+        SVC[Service Layer\nTypeScript API clients]
+        WIDGET[Chat Widget\nEmbeddable HTML/JS]
+    end
+
+    subgraph Backend ["Backend Component (FastAPI)"]
+        ROUTER[API Routers\nv1/* endpoints]
+        AUTH_MOD[Auth Module]
+        FINETUNE_MOD[Finetune Module]
+        CHAT_MOD[Chat Module]
+        BILLING_MOD[Billing Module]
+        KHALTI_MOD[Khalti Module]
+        TICKET_MOD[Ticket Module]
+        APIKEY_MOD[API Key Module]
+        RAG[RAG Engine\nBM25 + file I/O]
+        SEC[Security Layer\nJWT + API key validation]
+    end
+
+    subgraph Data ["Data Component"]
+        DB[(PostgreSQL\nSQLAlchemy ORM\nAlembic migrations)]
+        FILES[/Per-company\nRAG files/]
+    end
+
+    subgraph External ["External Services"]
+        GROQ[Groq LLM API]
+        KHALTI_GW[Khalti ePayment API]
+        TTS_SVC[Supertonic TTS]
+    end
+
+    DASH --> SVC
+    MW --> DASH
+    SVC --> ROUTER
+    WIDGET --> CHAT_MOD
+
+    ROUTER --> AUTH_MOD & FINETUNE_MOD & CHAT_MOD & BILLING_MOD & KHALTI_MOD & TICKET_MOD & APIKEY_MOD
+    CHAT_MOD --> RAG
+    CHAT_MOD --> GROQ
+    CHAT_MOD --> TTS_SVC
+    CHAT_MOD --> BILLING_MOD
+    KHALTI_MOD --> KHALTI_GW
+    AUTH_MOD & FINETUNE_MOD & BILLING_MOD & KHALTI_MOD & TICKET_MOD & APIKEY_MOD --> DB
+    SEC --> ROUTER
+    FINETUNE_MOD --> FILES
+    RAG --> FILES
