@@ -1,10 +1,10 @@
-# Front Matter
+# FRONT MATTER
 
-> Replace the bracketed placeholders with your details before printing.
+> **Print note:** Times New Roman 12pt, A4, margins Top=1" Bottom=1" Right=1" Left=1.25", line spacing 1.5, justified. Pages before Chapter 1 numbered in Roman numerals (i, ii, iii…); Chapter 1 onward in Arabic (1, 2, 3…). Binding: Golden Embracing with Black Binding, 3 copies (College Library + Self + Dean Office).
 
 ---
 
-## Cover Page
+## COVER & TITLE PAGE
 
 <div align="center">
 
@@ -12,129 +12,252 @@
 
 **FACULTY OF HUMANITIES AND SOCIAL SCIENCES**
 
+**[COLLEGE NAME], [CITY], NEPAL**
+
 ---
 
-# PERAI — MULTI-TENANT AI CHAT PLATFORM FOR COMPANIES
+<br/><br/>
+
+# PERAI: MULTI-TENANT AI CHAT PLATFORM FOR COMPANIES
+
+<br/>
 
 **A PROJECT REPORT**
 
-Submitted to
+<br/>
+
+*Submitted to the*
 
 **Department of Computer Application**
 
-**[College Name], [City], Nepal**
+*In partial fulfillment of the requirements for the degree of*
 
-In partial fulfillment of the requirements for the degree of
+**Bachelor of Computer Application (BCA)**
 
-**Bachelor of Computer Application (BCA) — 8th Semester**
+**(CACS452 – Project III)**
 
-Submitted by
+<br/><br/>
 
-**Prasanga Pokharel**
+*Submitted by*
 
-**TU Registration No: [XXXXXX-XXXX-XXXX]**
+**PRASANGA POKHAREL**
 
-**Symbol No: [XXXXXXXX]**
+**TU Registration No.: [XXXXXXXX-XXXX-XXXX]**
 
-Under the supervision of
+**Symbol No.: [XXXXXXXX]**
 
-**[Supervisor Name]**
+<br/>
 
-**[Month Year]**
+*Under the Supervision of*
+
+**[SUPERVISOR NAME]**
+
+**[Designation], Department of Computer Application**
+
+**[College Name]**
+
+<br/><br/>
+
+**[Month] [Year]**
 
 </div>
 
 ---
 
-## Supervisor's Recommendation
+## CERTIFICATE PAGE
 
-I hereby recommend that this project, prepared under my supervision by **Prasanga Pokharel**
-entitled **"Perai — Multi-Tenant AI Chat Platform for Companies"** in partial fulfillment of the
-requirements for the degree of Bachelor of Computer Application (BCA) of Tribhuvan University,
-be processed for evaluation.
+### i. Supervisor's Recommendation
 
-<br>
+This is to certify that the project report entitled **"Perai: Multi-Tenant AI Chat Platform for Companies"** submitted by **Prasanga Pokharel** (TU Reg. No. [XXXXXXXX-XXXX-XXXX]) has been prepared under my direct supervision and guidance. I hereby recommend this project report for evaluation.
+
+<br/>
 
 **[Supervisor Name]**
-Supervisor, Department of Computer Application
-[College Name]
+[Designation]
+Department of Computer Application
+[College Name], [City]
+Date: _______________
 
 ---
 
-## Letter of Approval
+### ii. Internal and External Examiners' Approval Letter
 
-This is to certify that this project prepared by **Prasanga Pokharel** entitled
-**"Perai — Multi-Tenant AI Chat Platform for Companies"** in partial fulfillment of the
-requirements for the degree of Bachelor of Computer Application has been evaluated. In our
-opinion, it is satisfactory in scope and quality as a project for the required degree.
+We, the undersigned, certify that we have examined the project report entitled **"Perai: Multi-Tenant AI Chat Platform for Companies"** submitted by **Prasanga Pokharel** and recommend it for acceptance as partial fulfillment of the requirements for the **Bachelor of Computer Application (BCA), 8th Semester, Tribhuvan University**.
 
-| Signature | Name | Designation |
-|-----------|------|-------------|
-| ________________ | [Supervisor Name] | Supervisor |
-| ________________ | [Internal Examiner] | Internal Examiner |
-| ________________ | [External Examiner] | External Examiner |
-| ________________ | [HOD / Coordinator] | Head of Department |
+<br/>
+
+| | Name | Signature | Date |
+|---|------|-----------|------|
+| **Supervisor** | [Supervisor Name] | _____________ | ________ |
+| **Internal Examiner** | [Internal Examiner Name] | _____________ | ________ |
+| **External Examiner** | [External Examiner Name] | _____________ | ________ |
+| **HOD / Coordinator** | [HOD Name] | _____________ | ________ |
 
 ---
 
-## Acknowledgement
+## ACKNOWLEDGEMENT
 
-I would like to express my sincere gratitude to my supervisor **[Supervisor Name]** for the
-continuous guidance, encouragement, and valuable suggestions throughout the development of this
-project. I am equally thankful to the **Department of Computer Application, [College Name]**
-for providing the platform and resources required to complete this work.
+*(Page ii)*
 
-I am also grateful to my teachers, friends, and family members who supported me directly or
-indirectly during the design, development, and documentation of this project.
+I would like to express my sincere gratitude to my supervisor, **[Supervisor Name]**, [Designation], Department of Computer Application, [College Name], for the continuous guidance, valuable suggestions, and encouragement throughout the entire project period.
+
+I am equally thankful to the **Head of Department** and all the faculty members of the Department of Computer Application, [College Name], for providing an environment conducive to learning and project development.
+
+I am also grateful to **Tribhuvan University** and the **Faculty of Humanities and Social Sciences** for prescribing this project course (CACS452) as part of the BCA curriculum, which provided the opportunity to apply the theoretical knowledge gained over four years of study to a real-world software system.
+
+Finally, I would like to thank my family and friends for their constant moral support and encouragement during the development of this project.
+
+<br/>
 
 **Prasanga Pokharel**
+TU Reg. No.: [XXXXXXXX-XXXX-XXXX]
+Department of Computer Application
+[College Name], [City]
+Date: _______________
 
 ---
 
-## Abstract
+## ABSTRACT
 
-Perai is a multi-tenant Business-to-Business (B2B) platform that lets any company deploy an
-AI-powered customer-support chat trained on its own knowledge base. A company registers on the
-portal, uploads its knowledge base as JSONL records, and immediately receives a branded chat
-widget and a REST API secured by API keys. Chat replies are generated by a Large Language Model
-(LLM) grounded with a lightweight, vectorless Retrieval-Augmented Generation (RAG) technique
-based on BM25 ranking, which keeps server cost low. Usage is metered per token and charged
-against a prepaid USD credit balance, which companies can top up through the **Khalti** payment
-gateway. The system is implemented with **FastAPI** (Python) on the backend, **Next.js**
-(React/TypeScript) on the frontend, and **PostgreSQL** as the database, with SQLAlchemy ORM and
-Alembic migrations. This report documents the analysis, design (flowcharts, DFDs, ER diagram),
-database normalization (1NF–3NF), implementation, and testing of the system.
+*(Page iii)*
 
-**Keywords:** Multi-tenant SaaS, LLM, RAG, FastAPI, Next.js, PostgreSQL, Khalti, Chatbot
+Perai is a multi-tenant Business-to-Business (B2B) Software-as-a-Service (SaaS) platform that enables any company to deploy an AI-powered customer support chat assistant trained on its own proprietary knowledge base, without requiring machine learning expertise or heavy infrastructure investment. Each company registers on the Perai portal, uploads its knowledge base as structured JSONL records, and immediately receives a ready-made branded chat widget and a documented REST API secured by hashed API keys.
+
+Chat responses are generated by a Large Language Model (LLM) — specifically the Llama 3.3 70B model served through the Groq inference API — grounded using a lightweight, vectorless Retrieval-Augmented Generation (RAG) technique based on BM25 ranking and exact-match retrieval. This approach eliminates the need for a vector database and embedding pipelines, keeping operational costs low. Responses are optionally streamed in real-time and may include Text-to-Speech (TTS) audio output.
+
+Usage is metered per token and charged against a prepaid USD credit balance. Companies can top up their balance online through the Khalti ePayment gateway (v2), with server-side payment verification, amount validation, and exactly-once idempotent crediting to prevent double charges.
+
+The system is implemented using **FastAPI** (Python 3) for the backend REST API, **Next.js 16** (React/TypeScript) with shadcn/ui for the frontend dashboard, **PostgreSQL** (SQLite for local development) as the relational database, **SQLAlchemy** as the ORM, and **Alembic** for schema migrations. The database schema is designed in **Third Normal Form (3NF)**, with 12 tables providing complete multi-tenant row-level isolation.
+
+This report documents the complete software engineering lifecycle of Perai: background study and literature review, system analysis and design (including use case, class, sequence, state, activity, component, and deployment diagrams), database design with normalization (1NF–3NF), implementation details, test cases, and future recommendations.
+
+**Keywords:** Multi-tenant SaaS, LLM, RAG, BM25, FastAPI, Next.js, PostgreSQL, Khalti, Chatbot, B2B
 
 ---
 
-## Table of Contents
+## TABLE OF CONTENTS
 
-1. **Introduction** — background, problem statement, objectives, scope and limitations
-2. **System Analysis** — requirements, feasibility study, use case model
-3. **System Design** — architecture, flowcharts, data flow diagrams (Level 0/1/2)
-4. **Database Design** — ER diagram, schema, normalization (1NF, 2NF, 3NF)
-5. **Implementation and Testing** — tools, modules, test cases and results
-6. **Conclusion and Future Recommendations**
+*(Page iv)*
 
-## List of Abbreviations
+| | | Page |
+|---|---|---|
+| Certificate | | i |
+| Acknowledgement | | ii |
+| Abstract | | iii |
+| Table of Contents | | iv |
+| List of Figures | | v |
+| List of Tables | | vi |
+| List of Abbreviations | | vii |
+| **Chapter 1: Introduction** | | **1** |
+| 1.1 | Introduction | 1 |
+| 1.2 | Problem Statement | 2 |
+| 1.3 | Objectives | 3 |
+| 1.4 | Scope and Limitation | 3 |
+| 1.5 | Development Methodology | 4 |
+| 1.6 | Report Organization | 5 |
+| **Chapter 2: Background Study and Literature Review** | | **6** |
+| 2.1 | Background Study | 6 |
+| 2.2 | Literature Review | 9 |
+| **Chapter 3: System Analysis and Design** | | **12** |
+| 3.1 | System Analysis | 12 |
+| 3.1.1 | Requirement Analysis | 12 |
+| 3.1.2 | Feasibility Analysis | 16 |
+| 3.1.3 | Object Modelling using Class and Object Diagrams | 18 |
+| 3.1.4 | Dynamic Modelling using State and Sequence Diagrams | 21 |
+| 3.1.5 | Process Modelling using Activity Diagrams | 25 |
+| 3.2 | System Design | 27 |
+| 3.2.1 | Refinement of Class, Object, State, Sequence and Activity Diagrams | 27 |
+| 3.2.2 | Component Diagrams | 28 |
+| 3.2.3 | Deployment Diagrams | 29 |
+| 3.3 | Algorithm Details | 30 |
+| **Chapter 4: Implementation and Testing** | | **33** |
+| 4.1 | Implementation | 33 |
+| 4.1.1 | Tools Used | 33 |
+| 4.1.2 | Implementation Details of Modules | 34 |
+| 4.2 | Testing | 39 |
+| 4.2.1 | Test Cases for Unit Testing | 39 |
+| 4.2.2 | Test Cases for System Testing | 41 |
+| 4.3 | Result Analysis | 43 |
+| **Chapter 5: Conclusion and Future Recommendations** | | **45** |
+| 5.1 | Conclusion | 45 |
+| 5.2 | Future Recommendations | 46 |
+| References | | 47 |
+| Bibliography | | 48 |
+| Appendices | | 49 |
+
+---
+
+## LIST OF FIGURES
+
+*(Page v)*
+
+| Figure No. | Title | Page |
+|-----------|-------|------|
+| Figure 1.1 | Incremental Development Methodology | 4 |
+| Figure 3.1 | Use Case Diagram | 14 |
+| Figure 3.2 | Class Diagram | 19 |
+| Figure 3.3 | Object Diagram (Company and Balance) | 20 |
+| Figure 3.4 | State Diagram – Khalti Payment | 21 |
+| Figure 3.5 | State Diagram – Chat Session | 22 |
+| Figure 3.6 | Sequence Diagram – User Registration and Login | 23 |
+| Figure 3.7 | Sequence Diagram – AI Chat Request | 24 |
+| Figure 3.8 | Sequence Diagram – Khalti Top-up | 25 |
+| Figure 3.9 | Activity Diagram – Knowledge Base Upload | 26 |
+| Figure 3.10 | Activity Diagram – Chat Request Flow | 27 |
+| Figure 3.11 | Component Diagram | 28 |
+| Figure 3.12 | Deployment Diagram | 29 |
+| Figure 4.1 | Dashboard – Balance Page with Khalti Button | 43 |
+| Figure 4.2 | Dashboard – Finetune (Knowledge Base) Page | 44 |
+
+---
+
+## LIST OF TABLES
+
+*(Page vi)*
+
+| Table No. | Title | Page |
+|----------|-------|------|
+| Table 3.1 | Functional Requirements | 12 |
+| Table 3.2 | Non-Functional Requirements | 13 |
+| Table 3.3 | Use Case Description – Register/Login | 15 |
+| Table 3.4 | Use Case Description – Khalti Top-up | 15 |
+| Table 3.5 | Use Case Description – AI Chat | 16 |
+| Table 3.6 | Technical Feasibility Analysis | 17 |
+| Table 4.1 | Tools and Technologies Used | 33 |
+| Table 4.2 | Unit Test Cases – Authentication Module | 39 |
+| Table 4.3 | Unit Test Cases – Khalti Payment Module | 40 |
+| Table 4.4 | System Test Cases | 41 |
+
+---
+
+## LIST OF ABBREVIATIONS
+
+*(Page vii)*
 
 | Abbreviation | Full Form |
-|--------------|-----------|
+|-------------|-----------|
 | API | Application Programming Interface |
 | B2B | Business to Business |
-| BM25 | Best Matching 25 (ranking function) |
+| BM25 | Best Matching 25 (term-frequency ranking function) |
+| CACS | Computer Application and Computer Science |
 | CRUD | Create, Read, Update, Delete |
 | DFD | Data Flow Diagram |
 | ER | Entity Relationship |
-| JSONL | JSON Lines |
+| FAQ | Frequently Asked Question |
+| HTTP | Hypertext Transfer Protocol |
+| JSONL | JSON Lines (newline-delimited JSON) |
 | JWT | JSON Web Token |
 | LLM | Large Language Model |
 | NF | Normal Form |
+| NPR | Nepalese Rupee |
 | ORM | Object Relational Mapping |
+| OTP | One-Time Password |
 | RAG | Retrieval-Augmented Generation |
 | REST | Representational State Transfer |
 | SaaS | Software as a Service |
+| SQL | Structured Query Language |
 | TTS | Text To Speech |
+| TU | Tribhuvan University |
 | UI | User Interface |
+| UML | Unified Modelling Language |
+| USD | United States Dollar |
