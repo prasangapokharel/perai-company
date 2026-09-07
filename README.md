@@ -96,3 +96,13 @@ Never commit `.env` or API keys to git.
 ## License
 
 Private / all rights reserved unless otherwise noted.
+
+
+## Default accounts (local dev)
+
+| Role | Email | Password |
+|------|-------|----------|
+| Platform admin | `admin@perai.com` | `admin1234` |
+| Company | `demo@perai.com` | `demo1234` |
+
+Change these before any non-local deployment.

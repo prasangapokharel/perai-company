@@ -38,13 +38,17 @@ def upgrade() -> None:
         sa.Column('issue', sa.Text(), nullable=False),
         sa.Column(
             'category',
-            sa.Enum('payment', 'technical', 'general', name='ticketcategory'),
+            postgresql.ENUM(
+                'payment', 'technical', 'general',
+                name='ticketcategory',
+                create_type=False,
+            ),
             nullable=False,
             server_default='general',
         ),
         sa.Column(
             'status',
-            sa.Enum('open', 'closed', name='ticketstatus'),
+            postgresql.ENUM('open', 'closed', name='ticketstatus', create_type=False),
             nullable=False,
             server_default='open',
         ),

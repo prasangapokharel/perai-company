@@ -13,11 +13,11 @@ SUPABASE_URL: str = getenv("SUPABASE_URL", "")
 SUPABASE_KEY: str = getenv("SUPABASE_KEY", "")
 SUPABASE_PASSWORD: str = getenv("SUPABASE_PASSWORD", "")
 
-DB_HOST: str = getenv("DB_HOST", "aws-1-ap-south-1.pooler.supabase.com")
-DB_HOST_FALLBACK: str = getenv("DB_HOST_FALLBACK", "db.lxopuyaxcxrglkfcbree.supabase.co")
+DB_HOST: str = getenv("DB_HOST", "aws-0-ap-south-1.pooler.supabase.com")
+DB_HOST_FALLBACK: str = getenv("DB_HOST_FALLBACK", "db.jxxkvkihizphucyeqebh.supabase.co")
 DB_PORT: str = getenv("DB_PORT", "5432")
 DB_NAME: str = getenv("DB_NAME", "postgres")
-DB_USER: str = getenv("DB_USER", "postgres.lxopuyaxcxrglkfcbree")
+DB_USER: str = getenv("DB_USER", "postgres.jxxkvkihizphucyeqebh")
 DB_USER_DIRECT: str = getenv("DB_USER_DIRECT", "postgres")
 
 
@@ -76,7 +76,7 @@ def _load_groq_api_keys() -> list[str]:
 
 GROQ_API_KEYS: list[str] = _load_groq_api_keys()
 GROQ_API_KEY: str = GROQ_API_KEYS[0] if GROQ_API_KEYS else ""
-GROQ_MODEL: str = getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+GROQ_MODEL: str = getenv("GROQ_MODEL", "groq/compound")
 GROQ_MODEL_INPUT_COST: str = getenv("GROQ_MODEL_INPUT_COST", "0.0003")
 GROQ_MODEL_OUTPUT_COST: str = getenv("GROQ_MODEL_OUTPUT_COST", "0.0003")
 
